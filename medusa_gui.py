@@ -57,9 +57,7 @@ class MedusaApp(QMainWindow):
             self,
             "Select Medusa Wavetable File",  # Dialog title
             "",  # Starting directory
-            "Polyend Files (*.polyend)",  # File filter
-            None,  # Selected filter
-            QFileDialog.Option.DontUseNativeDialog  # Use Qt dialog for consistent look
+            "Polyend Files (*.polyend)"  # File filter
         )
         if input_file:
             result = decompile_wavetable(input_file)
@@ -80,8 +78,7 @@ class MedusaApp(QMainWindow):
         input_dir = QFileDialog.getExistingDirectory(
             self,
             "Select Directory Containing Wavetable WAV Files",  # More descriptive title
-            "",
-            QFileDialog.Option.ShowDirsOnly | QFileDialog.Option.DontUseNativeDialog
+            ""
         )
         if input_dir:
             # Default output file next to the waves directory
@@ -92,9 +89,7 @@ class MedusaApp(QMainWindow):
                 self,
                 "Save Recompiled Wavetable File As",  # More descriptive title
                 default_output,
-                "Polyend Files (*.polyend)",
-                None,
-                QFileDialog.Option.DontUseNativeDialog
+                "Polyend Files (*.polyend)"
             )
             if output_file:
                 result = recompile_wavetable(input_dir, output_file)
@@ -115,8 +110,7 @@ class MedusaApp(QMainWindow):
         input_dir = QFileDialog.getExistingDirectory(
             self,
             "Select Directory Containing WAV Files to Process",  # More descriptive title
-            "",
-            QFileDialog.Option.ShowDirsOnly | QFileDialog.Option.DontUseNativeDialog
+            ""
         )
         if input_dir:
             # Create processed directory next to input directory
