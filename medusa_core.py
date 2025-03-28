@@ -3,6 +3,7 @@
 import os
 import wave
 import struct
+import shutil
 import numpy as np
 from pathlib import Path
 
@@ -15,6 +16,16 @@ DATA_OFFSET = 0x80  # Fixed offset where waveform data starts
 NUM_WAVETABLES = 64  # Fixed number of wavetables
 IDENTIFIER_SIZE = 4  # Size of identifier bytes after header
 TOTAL_FILE_SIZE = 1024128  # Exact size of the file
+
+def extract_identifiers(polyend_file):
+    """Extract identifiers from a .polyend file."""
+    identifiers = []
+    with open(polyend_file, 'rb') as f:
+        data = f.read()
+        for i in range(NUM_WAVETABLES):
+            start = i * WAVETABLE_SIZE + 4  # ID starts at offset 4
+            identifiers.append(data[start:start + IDENTIFIER_SIZE])
+    return identifiers
 
 def decompile_wavetable(input_file, output_dir=None):
     """Extract wavetables from .polyend file to WAV files."""
@@ -168,6 +179,21 @@ def process_wavs(input_dir, output_dir):
         wav_files = sorted(Path(input_dir).glob('*.wav'))[:NUM_WAVETABLES]  # Limit to 64 files
         if not wav_files:
             raise Exception("No WAV files found in input directory")
+        
+        # First check if we have original.polyend for identifiers
+        original_file = os.path.join(input_dir, 'original.polyend')
+        if os.path.exists(original_file):
+            # Copy original file to output directory
+            shutil.copy2(original_file, os.path.join(output_dir, 'original.polyend'))
+            
+            # Extract identifiers from original file
+            identifiers = extract_identifiers(original_file)
+            
+            # Save identifiers to separate files
+            for i, identifier in enumerate(identifiers):
+                id_file = os.path.join(output_dir, f'wavetable_{i:02d}.id')
+                with open(id_file, 'wb') as f:
+                    f.write(identifier)
         
         for i, wav_path in enumerate(wav_files):
             output_wav = os.path.join(output_dir, f'wavetable_{i:02d}.wav')
