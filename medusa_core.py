@@ -4,6 +4,7 @@ import os
 import wave
 import struct
 import shutil
+import json
 import numpy as np
 from pathlib import Path
 
@@ -24,7 +25,7 @@ def extract_identifiers(polyend_file):
         data = f.read()
         for i in range(NUM_WAVETABLES):
             start = i * WAVETABLE_SIZE + 4  # ID starts at offset 4
-            identifiers.append(data[start:start + IDENTIFIER_SIZE])
+            identifiers.append(data[start:start + IDENTIFIER_SIZE].hex())
     return identifiers
 
 def decompile_wavetable(input_file, output_dir=None):
@@ -43,6 +44,12 @@ def decompile_wavetable(input_file, output_dir=None):
         with open(os.path.join(output_dir, 'original.polyend'), 'wb') as f:
             f.write(data)
         
+        # Extract identifiers and save to metadata file
+        identifiers = extract_identifiers(input_file)
+        metadata = {'identifiers': identifiers}
+        with open(os.path.join(output_dir, 'metadata.json'), 'w') as f:
+            json.dump(metadata, f, indent=2)
+        
         # Extract wavetables
         num_wavetables = len(data) // WAVETABLE_SIZE
         extracted_files = []
@@ -52,11 +59,6 @@ def decompile_wavetable(input_file, output_dir=None):
             start = i * WAVETABLE_SIZE
             end = start + WAVETABLE_SIZE
             wavetable_data = data[start:end]
-            
-            # Save identifier
-            id_file = os.path.join(output_dir, f'wavetable_{i:02d}.id')
-            with open(id_file, 'wb') as f:
-                f.write(wavetable_data[4:8])  # ID is at offset 4
             
             # Extract waveform data (starts at offset 0x80)
             waveform_data = wavetable_data[DATA_OFFSET:]
@@ -95,22 +97,23 @@ def recompile_wavetable(input_dir, output_file):
         else:
             original_data = None
         
+        # Load identifiers from metadata file
+        metadata_file = os.path.join(input_dir, 'metadata.json')
+        if os.path.exists(metadata_file):
+            with open(metadata_file, 'r') as f:
+                metadata = json.load(f)
+                identifiers = [bytes.fromhex(id_hex) for id_hex in metadata['identifiers']]
+        else:
+            identifiers = [b'\x00' * IDENTIFIER_SIZE] * NUM_WAVETABLES
+        
         wavetables = []
         processed_files = []
         
         for i in range(NUM_WAVETABLES):
             wav_file = os.path.join(input_dir, f'wavetable_{i:02d}.wav')
-            id_file = os.path.join(input_dir, f'wavetable_{i:02d}.id')
             
             if not os.path.exists(wav_file):
                 raise Exception(f"Missing wavetable_{i:02d}.wav")
-            
-            # Read identifier if it exists
-            if os.path.exists(id_file):
-                with open(id_file, 'rb') as f:
-                    identifier = f.read()
-            else:
-                identifier = b'\x00' * IDENTIFIER_SIZE
             
             with wave.open(wav_file, 'rb') as wav:
                 if wav.getnchannels() != 1 or wav.getsampwidth() != 2:
@@ -125,7 +128,7 @@ def recompile_wavetable(input_dir, output_file):
             result[0:4] = header
             
             # Write identifier
-            result[4:8] = identifier
+            result[4:8] = identifiers[i]
             
             # Write subheader
             result[0x40:0x44] = SUBHEADER_MARKER
@@ -186,14 +189,11 @@ def process_wavs(input_dir, output_dir):
             # Copy original file to output directory
             shutil.copy2(original_file, os.path.join(output_dir, 'original.polyend'))
             
-            # Extract identifiers from original file
+            # Extract identifiers and save to metadata file
             identifiers = extract_identifiers(original_file)
-            
-            # Save identifiers to separate files
-            for i, identifier in enumerate(identifiers):
-                id_file = os.path.join(output_dir, f'wavetable_{i:02d}.id')
-                with open(id_file, 'wb') as f:
-                    f.write(identifier)
+            metadata = {'identifiers': identifiers}
+            with open(os.path.join(output_dir, 'metadata.json'), 'w') as f:
+                json.dump(metadata, f, indent=2)
         
         for i, wav_path in enumerate(wav_files):
             output_wav = os.path.join(output_dir, f'wavetable_{i:02d}.wav')
