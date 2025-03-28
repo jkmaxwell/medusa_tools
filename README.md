@@ -28,17 +28,24 @@ The `medusa_wavetable_tool.py` script allows you to extract, modify, and recompi
    chmod +x medusa_wavetable_tool.py medusa_wav_preprocessor.py
    ```
 
-#### Native Mac App
-The tool is available as a native macOS application:
+#### Mac Version
+The tool is available as a command-line application:
 
-1. Download the latest release
-2. Move Medusa.app to your Applications folder
-3. Right-click (or Control-click) on Medusa.app and select "Open"
-4. Click "Open" in the security dialog that appears
-5. Use the app to:
-   - Decompile .polyend files into WAV files
-   - Recompile WAV files into wavetables
-   - Process custom WAV files
+```bash
+# Extract wavetables from a .polyend file
+./medusa_mac.py decompile input.polyend
+
+# Create a .polyend file from WAV files
+./medusa_mac.py recompile waves_dir output.polyend
+
+# Process custom WAV files for use with Medusa
+./medusa_mac.py process input_dir output_dir
+```
+
+The tool will:
+- Automatically create a 'waves' directory for decompiled files
+- Preserve all metadata and file structure
+- Process WAV files to the correct format (mono, 44.1kHz, 16-bit)
 
 #### Build from Source
 1. Create a virtual environment:
