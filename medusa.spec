@@ -6,8 +6,11 @@ a = Analysis(
     ['medusa_mac.py'],
     pathex=[],
     binaries=[],
-    datas=[],
-    hiddenimports=['rumps', 'numpy'],
+    datas=[
+        ('medusa_wavetable_tool.py', '.'),
+        ('medusa_wav_preprocessor.py', '.')
+    ],
+    hiddenimports=['PySide6', 'PySide6.QtCore', 'PySide6.QtGui', 'PySide6.QtWidgets'],
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
@@ -55,7 +58,8 @@ app = BUNDLE(
     icon=None,
     bundle_identifier='com.code404.medusa',
     info_plist={
-        'LSUIElement': True,  # Makes it a menu bar app
+        'CFBundleDisplayName': 'Medusa Wavetable Tool',
+        'CFBundleName': 'Medusa',
         'CFBundleShortVersionString': '1.0.0',
         'CFBundleVersion': '1.0.0',
         'NSHighResolutionCapable': 'True'
