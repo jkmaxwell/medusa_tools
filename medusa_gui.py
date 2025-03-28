@@ -8,11 +8,12 @@ from PySide6.QtCore import Qt
 from medusa_core import decompile_wavetable, recompile_wavetable, process_wavs
 
 VERSION = "1.0.0"
+APP_NAME = "Medusa Waveform Utility"
 
 class MedusaApp(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle(f'Medusa Wavetable Tool v{VERSION}')
+        self.setWindowTitle(f'{APP_NAME} v{VERSION}')
         self.setFixedSize(400, 300)
         
         # Create central widget and layout
@@ -22,7 +23,7 @@ class MedusaApp(QMainWindow):
         layout.setAlignment(Qt.AlignmentFlag.AlignTop)
         
         # Add title
-        title = QLabel("Medusa Wavetable Tool")
+        title = QLabel(APP_NAME)
         title.setStyleSheet("font-size: 20px; font-weight: bold;")
         title.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(title)
@@ -53,13 +54,14 @@ class MedusaApp(QMainWindow):
         layout.addWidget(about_btn)
     
     def select_decompile_input(self):
-        input_file, _ = QFileDialog.getOpenFileName(
-            self,
-            "Select Medusa Wavetable File",  # Dialog title
-            "",  # Starting directory
-            "Polyend Files (*.polyend)"  # File filter
-        )
-        if input_file:
+        dialog = QFileDialog(self)
+        dialog.setWindowTitle("Select Medusa Wavetable File")
+        dialog.setNameFilter("Polyend Files (*.polyend)")
+        dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
+        dialog.setViewMode(QFileDialog.ViewMode.Detail)
+        
+        if dialog.exec() == QFileDialog.DialogCode.Accepted:
+            input_file = dialog.selectedFiles()[0]
             result = decompile_wavetable(input_file)
             if result['success']:
                 QMessageBox.information(
@@ -75,23 +77,27 @@ class MedusaApp(QMainWindow):
                 )
     
     def select_recompile_input(self):
-        input_dir = QFileDialog.getExistingDirectory(
-            self,
-            "Select Directory Containing Wavetable WAV Files",  # More descriptive title
-            ""
-        )
-        if input_dir:
+        dialog = QFileDialog(self)
+        dialog.setWindowTitle("Select Directory Containing Wavetable WAV Files")
+        dialog.setFileMode(QFileDialog.FileMode.Directory)
+        dialog.setOption(QFileDialog.Option.ShowDirsOnly)
+        
+        if dialog.exec() == QFileDialog.DialogCode.Accepted:
+            input_dir = dialog.selectedFiles()[0]
+            
             # Default output file next to the waves directory
             parent_dir = os.path.dirname(input_dir)
             default_output = os.path.join(parent_dir, "recompiled.polyend")
             
-            output_file, _ = QFileDialog.getSaveFileName(
-                self,
-                "Save Recompiled Wavetable File As",  # More descriptive title
-                default_output,
-                "Polyend Files (*.polyend)"
-            )
-            if output_file:
+            save_dialog = QFileDialog(self)
+            save_dialog.setWindowTitle("Save Recompiled Wavetable File As")
+            save_dialog.setNameFilter("Polyend Files (*.polyend)")
+            save_dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
+            save_dialog.setDirectory(parent_dir)
+            save_dialog.selectFile("recompiled.polyend")
+            
+            if save_dialog.exec() == QFileDialog.DialogCode.Accepted:
+                output_file = save_dialog.selectedFiles()[0]
                 result = recompile_wavetable(input_dir, output_file)
                 if result['success']:
                     QMessageBox.information(
@@ -107,12 +113,13 @@ class MedusaApp(QMainWindow):
                     )
     
     def select_process_input(self):
-        input_dir = QFileDialog.getExistingDirectory(
-            self,
-            "Select Directory Containing WAV Files to Process",  # More descriptive title
-            ""
-        )
-        if input_dir:
+        dialog = QFileDialog(self)
+        dialog.setWindowTitle("Select Directory Containing WAV Files to Process")
+        dialog.setFileMode(QFileDialog.FileMode.Directory)
+        dialog.setOption(QFileDialog.Option.ShowDirsOnly)
+        
+        if dialog.exec() == QFileDialog.DialogCode.Accepted:
+            input_dir = dialog.selectedFiles()[0]
             # Create processed directory next to input directory
             output_dir = os.path.join(os.path.dirname(input_dir), 'processed')
             
@@ -134,8 +141,8 @@ class MedusaApp(QMainWindow):
     def about(self):
         QMessageBox.about(
             self,
-            "About Medusa Wavetable Tool",
-            f"Medusa Wavetable Tool v{VERSION}\n\n"
+            f"About {APP_NAME}",
+            f"{APP_NAME} v{VERSION}\n\n"
             "A tool for working with Polyend Medusa synthesizer wavetables.\n\n"
             "Features:\n"
             "• Extract wavetables from .polyend files\n"

@@ -102,8 +102,8 @@ app = BUNDLE(
     icon='icon.icns',
     bundle_identifier='com.code404.medusa',
     info_plist={
-        'CFBundleDisplayName': 'Medusa Wavetable Tool',
-        'CFBundleName': 'Medusa',
+        'CFBundleDisplayName': 'Medusa Waveform Utility',
+        'CFBundleName': 'Medusa Waveform Utility',
         'CFBundleShortVersionString': '1.0.0',
         'CFBundleVersion': '1.0.0',
         'NSHighResolutionCapable': 'True'
