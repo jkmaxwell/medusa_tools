@@ -29,11 +29,27 @@ The `medusa_wavetable_tool.py` script allows you to extract, modify, and recompi
    ```
 
 #### Mac Version
+
+1. Clone or download this repository
+2. Create and activate virtual environment:
+   ```bash
+   python3 -m venv venv
+   source venv/bin/activate
+   ```
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+4. Make the script executable:
+   ```bash
+   chmod +x medusa_mac.py
+   ```
+
 The tool is available as a command-line application:
 
 ```bash
-# Extract wavetables from a .polyend file
-./medusa_mac.py decompile input.polyend
+# Extract wavetables from a .polyend file (defaults to medusa64Wavetables.polyend)
+./medusa_mac.py decompile [input.polyend]
 
 # Create a .polyend file from WAV files
 ./medusa_mac.py recompile waves_dir output.polyend
