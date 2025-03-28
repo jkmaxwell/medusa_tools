@@ -55,9 +55,11 @@ class MedusaApp(QMainWindow):
     def select_decompile_input(self):
         input_file, _ = QFileDialog.getOpenFileName(
             self,
-            "Select .polyend File",
-            "",
-            "Polyend Files (*.polyend)"
+            "Select Medusa Wavetable File",  # Dialog title
+            "",  # Starting directory
+            "Polyend Files (*.polyend)",  # File filter
+            None,  # Selected filter
+            QFileDialog.Option.DontUseNativeDialog  # Use Qt dialog for consistent look
         )
         if input_file:
             result = decompile_wavetable(input_file)
@@ -77,7 +79,9 @@ class MedusaApp(QMainWindow):
     def select_recompile_input(self):
         input_dir = QFileDialog.getExistingDirectory(
             self,
-            "Select waves Directory"
+            "Select Directory Containing Wavetable WAV Files",  # More descriptive title
+            "",
+            QFileDialog.Option.ShowDirsOnly | QFileDialog.Option.DontUseNativeDialog
         )
         if input_dir:
             # Default output file next to the waves directory
@@ -86,9 +90,11 @@ class MedusaApp(QMainWindow):
             
             output_file, _ = QFileDialog.getSaveFileName(
                 self,
-                "Save Wavetable As",
+                "Save Recompiled Wavetable File As",  # More descriptive title
                 default_output,
-                "Polyend Files (*.polyend)"
+                "Polyend Files (*.polyend)",
+                None,
+                QFileDialog.Option.DontUseNativeDialog
             )
             if output_file:
                 result = recompile_wavetable(input_dir, output_file)
@@ -108,7 +114,9 @@ class MedusaApp(QMainWindow):
     def select_process_input(self):
         input_dir = QFileDialog.getExistingDirectory(
             self,
-            "Select Folder with WAV Files"
+            "Select Directory Containing WAV Files to Process",  # More descriptive title
+            "",
+            QFileDialog.Option.ShowDirsOnly | QFileDialog.Option.DontUseNativeDialog
         )
         if input_dir:
             # Create processed directory next to input directory
