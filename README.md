@@ -109,6 +109,13 @@ If you encounter issues:
 3. Ensure all 64 wavetables are present when recompiling
 4. Use the --verify-with option to check file integrity
 
+### Support the Project
+
+If you find this tool useful, consider supporting its development:
+
+[![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/code404)
+[![Venmo](https://img.shields.io/badge/Venmo-008CFF?style=for-the-badge&logo=venmo&logoColor=white)](https://venmo.com/octavecat)
+
 ### Contributing
 
 Feel free to submit issues, fork the repository, and create pull requests for any improvements.
