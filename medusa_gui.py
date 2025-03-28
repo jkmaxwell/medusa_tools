@@ -6,10 +6,12 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 from medusa_core import decompile_wavetable, recompile_wavetable, process_wavs
 
+VERSION = "1.0.0"
+
 class MedusaApp:
     def __init__(self, root):
         self.root = root
-        self.root.title('Medusa Wavetable Tool')
+        self.root.title(f'Medusa Wavetable Tool v{VERSION}')
         self.root.geometry('400x300')
         
         # Create main frame
@@ -98,6 +100,7 @@ class MedusaApp:
     def about(self):
         messagebox.showinfo(
             "About Medusa Wavetable Tool",
+            f"Medusa Wavetable Tool v{VERSION}\n\n"
             "A tool for working with Polyend Medusa synthesizer wavetables.\n\n"
             "Features:\n"
             "• Extract wavetables from .polyend files\n"
