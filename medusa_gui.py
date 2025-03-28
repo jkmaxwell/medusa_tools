@@ -52,11 +52,6 @@ class MedusaApp(QMainWindow):
         create_btn.setToolTip("Create wavetable bank directly from audio files")
         layout.addWidget(create_btn)
         
-        process_btn = QPushButton("Process Custom WAVs")
-        process_btn.clicked.connect(self.select_process_input)
-        process_btn.setToolTip("Convert WAV files to Medusa-compatible format")
-        layout.addWidget(process_btn)
-        
         about_btn = QPushButton("About")
         about_btn.clicked.connect(self.about)
         about_btn.setToolTip("Show information about this application")
@@ -120,32 +115,6 @@ class MedusaApp(QMainWindow):
                         "Error",
                         f"Error recompiling wavetables: {result['error']}"
                     )
-    
-    def select_process_input(self):
-        dialog = QFileDialog(self)
-        dialog.setWindowTitle("Select Directory Containing WAV Files to Process")
-        dialog.setFileMode(QFileDialog.FileMode.Directory)
-        dialog.setOption(QFileDialog.Option.ShowDirsOnly)
-        
-        if dialog.exec() == QFileDialog.DialogCode.Accepted:
-            input_dir = dialog.selectedFiles()[0]
-            # Create processed directory next to input directory
-            output_dir = os.path.join(os.path.dirname(input_dir), 'processed')
-            
-            result = process_wavs(input_dir, output_dir)
-            if result['success']:
-                QMessageBox.information(
-                    self,
-                    "Success",
-                    f"Processed {result['num_files']} WAV files to {result['output_dir']}\n"
-                    "You can now use Recompile Wavetables to create a .polyend file."
-                )
-            else:
-                QMessageBox.critical(
-                    self,
-                    "Error",
-                    f"Error processing WAVs: {result['error']}"
-                )
     
     def select_create_input(self):
         # First select input directory
@@ -219,8 +188,8 @@ class MedusaApp(QMainWindow):
             "A tool for working with Polyend Medusa synthesizer wavetables.\n\n"
             "Features:\n"
             "• Extract wavetables from .polyend files\n"
-            "• Recompile WAV files into wavetables\n"
-            "• Process custom WAV files for use with Medusa\n\n"
+            "• Create wavetable banks from audio files\n"
+            "• Support for random or alphabetical file selection\n\n"
             "© 2024 All rights reserved."
         )
 
