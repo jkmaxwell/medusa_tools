@@ -204,6 +204,94 @@ def recompile_wavetable(input_dir, output_file):
             'error': str(e)
         }
 
+import subprocess
+import random
+import glob
+
+def create_wavetable_bank(input_dir, output_file, random_order=False, temp_dir='temp_waves'):
+    """Create a wavetable bank from a directory of audio files.
+    
+    Args:
+        input_dir: Directory containing audio files
+        output_file: Path for the output .polyend file
+        random_order: If True, select files randomly. If False, use alphabetical order
+        temp_dir: Directory for temporary WAV files
+        
+    Returns:
+        dict: Result of the operation with success status and details
+    """
+    try:
+        # Create temp directory
+        os.makedirs(temp_dir, exist_ok=True)
+        
+        # Find all audio files (wav, aif, aiff, etc.)
+        audio_files = []
+        for ext in ['*.wav', '*.aif', '*.aiff', '*.mp3', '*.ogg']:
+            audio_files.extend(glob.glob(os.path.join(input_dir, '**', ext), recursive=True))
+        
+        if not audio_files:
+            raise Exception("No audio files found in input directory")
+            
+        # Select files
+        if len(audio_files) > NUM_WAVETABLES:
+            if random_order:
+                audio_files = random.sample(audio_files, NUM_WAVETABLES)
+            else:
+                audio_files = sorted(audio_files)[:NUM_WAVETABLES]
+        
+        # Convert files to WAV format
+        converted_files = []
+        for i, audio_file in enumerate(audio_files):
+            output_wav = os.path.join(temp_dir, f'temp_{i:02d}.wav')
+            try:
+                subprocess.run([
+                    'ffmpeg', '-y',
+                    '-i', audio_file,
+                    '-ar', '44100',
+                    '-ac', '1',
+                    '-acodec', 'pcm_s16le',
+                    output_wav
+                ], check=True, capture_output=True)
+                converted_files.append(output_wav)
+            except subprocess.CalledProcessError as e:
+                print(f"Warning: Failed to convert {audio_file}: {e}")
+                continue
+        
+        if not converted_files:
+            raise Exception("No files were successfully converted")
+            
+        # Process the converted files
+        process_result = process_wavs(temp_dir, os.path.join(temp_dir, 'processed'))
+        if not process_result['success']:
+            raise Exception(f"Failed to process WAVs: {process_result['error']}")
+            
+        # Create the final wavetable bank
+        recompile_result = recompile_wavetable(
+            os.path.join(temp_dir, 'processed'),
+            output_file
+        )
+        
+        # Clean up temp files
+        shutil.rmtree(temp_dir, ignore_errors=True)
+        
+        if not recompile_result['success']:
+            raise Exception(f"Failed to create wavetable bank: {recompile_result['error']}")
+            
+        return {
+            'success': True,
+            'output_file': output_file,
+            'num_wavetables': recompile_result['num_wavetables'],
+            'source_files': audio_files
+        }
+        
+    except Exception as e:
+        # Clean up temp files on error
+        shutil.rmtree(temp_dir, ignore_errors=True)
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
 def process_wavs(input_dir, output_dir):
     """Convert WAV files to Medusa-compatible format."""
     try:
