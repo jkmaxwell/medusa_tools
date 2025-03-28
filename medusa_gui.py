@@ -8,7 +8,7 @@ from PySide6.QtCore import Qt
 from medusa_core import decompile_wavetable, recompile_wavetable, process_wavs
 
 VERSION = "1.0.0"
-APP_NAME = "Medusa Waveform Utility"
+APP_NAME = "Medusa Wavetable Utility"
 
 class MedusaApp(QMainWindow):
     def __init__(self):
@@ -39,18 +39,27 @@ class MedusaApp(QMainWindow):
         # Add buttons
         decompile_btn = QPushButton("Decompile .polyend File")
         decompile_btn.clicked.connect(self.select_decompile_input)
+        decompile_btn.setToolTip("Extract wavetables from a .polyend file to WAV files")
         layout.addWidget(decompile_btn)
         
         recompile_btn = QPushButton("Recompile Wavetables")
         recompile_btn.clicked.connect(self.select_recompile_input)
+        recompile_btn.setToolTip("Create .polyend file from processed WAV files")
         layout.addWidget(recompile_btn)
+        
+        create_btn = QPushButton("Create from Audio Files")
+        create_btn.clicked.connect(self.select_create_input)
+        create_btn.setToolTip("Create wavetable bank directly from audio files")
+        layout.addWidget(create_btn)
         
         process_btn = QPushButton("Process Custom WAVs")
         process_btn.clicked.connect(self.select_process_input)
+        process_btn.setToolTip("Convert WAV files to Medusa-compatible format")
         layout.addWidget(process_btn)
         
         about_btn = QPushButton("About")
         about_btn.clicked.connect(self.about)
+        about_btn.setToolTip("Show information about this application")
         layout.addWidget(about_btn)
     
     def select_decompile_input(self):
@@ -137,6 +146,70 @@ class MedusaApp(QMainWindow):
                     "Error",
                     f"Error processing WAVs: {result['error']}"
                 )
+    
+    def select_create_input(self):
+        # First select input directory
+        input_dir = QFileDialog.getExistingDirectory(
+            self,
+            "Select Directory Containing Audio Files",
+            "",
+            QFileDialog.Option.ShowDirsOnly
+        )
+        
+        if not input_dir:
+            return
+            
+        # Ask for selection mode
+        msg = QMessageBox(self)
+        msg.setWindowTitle("File Selection Mode")
+        msg.setText("How would you like to select the audio files?")
+        msg.setInformativeText("Choose between alphabetical order or random selection.")
+        alpha_btn = msg.addButton("Alphabetical", QMessageBox.ButtonRole.AcceptRole)
+        random_btn = msg.addButton("Random", QMessageBox.ButtonRole.AcceptRole)
+        cancel_btn = msg.addButton(QMessageBox.StandardButton.Cancel)
+        msg.setDefaultButton(alpha_btn)
+        
+        msg.exec()
+        clicked_button = msg.clickedButton()
+        
+        if clicked_button == cancel_btn:
+            return
+            
+        random_mode = (clicked_button == random_btn)
+        
+        # Get output file location
+        output_file, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Wavetable Bank As",
+            "wavetables.polyend",
+            "Polyend Files (*.polyend)"
+        )
+        
+        if not output_file:
+            return
+            
+        # Create the wavetable bank
+        result = medusa_core.create_wavetable_bank(
+            input_dir,
+            output_file,
+            random_order=random_mode
+        )
+        
+        if result['success']:
+            QMessageBox.information(
+                self,
+                "Success",
+                f"Successfully created wavetable bank:\n"
+                f"- Output file: {result['output_file']}\n"
+                f"- Number of wavetables: {result['num_wavetables']}\n"
+                f"- Source files: {len(result['source_files'])}"
+            )
+        else:
+            QMessageBox.critical(
+                self,
+                "Error",
+                f"Error creating wavetable bank: {result['error']}"
+            )
     
     def about(self):
         QMessageBox.about(
