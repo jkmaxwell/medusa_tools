@@ -27,4 +27,8 @@ processed/
 *.polyend
 *.zip
 recompiled.polyend
-icon.svg
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
