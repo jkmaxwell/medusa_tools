@@ -60,7 +60,7 @@ gui_a = Analysis(
     ['medusa_gui.py'],
     **{
         **common_analysis,
-        'hiddenimports': common_analysis['hiddenimports'] + ['tkinter']
+        'hiddenimports': common_analysis['hiddenimports'] + ['PySide6.QtCore', 'PySide6.QtWidgets']
     }
 )
 
