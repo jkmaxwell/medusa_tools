@@ -13,6 +13,14 @@ class MedusaWavetableApp(rumps.App):
                                                 title="M",  # Simple text instead of icon
                                                 quit_button="Quit")
         
+        # Get the directory where our bundled scripts are
+        if getattr(sys, 'frozen', False):
+            # We're running in a bundle
+            self.bundle_dir = os.path.dirname(os.path.realpath(sys.executable))
+        else:
+            # We're running in a normal Python environment
+            self.bundle_dir = os.path.dirname(os.path.realpath(__file__))
+        
         # Decompile menu
         self.decompile_menu = rumps.MenuItem("Decompile Wavetable")
         self.decompile_menu.add(rumps.MenuItem("Select .polyend File...", callback=self.select_decompile_input))
@@ -41,7 +49,8 @@ class MedusaWavetableApp(rumps.App):
                     cmd,
                     stdout=subprocess.PIPE,
                     stderr=subprocess.PIPE,
-                    text=True
+                    text=True,
+                    cwd=self.bundle_dir  # Run commands from the bundle directory
                 )
                 stdout, stderr = process.communicate()
                 
@@ -130,9 +139,10 @@ class MedusaWavetableApp(rumps.App):
         if not output_dir:
             return
         
+        wavetable_script = os.path.join(self.bundle_dir, "medusa_wavetable_tool.py")
         cmd = [
             sys.executable,
-            "medusa_wavetable_tool.py",
+            wavetable_script,
             "decompile",
             input_file,
             "--output",
@@ -153,9 +163,10 @@ class MedusaWavetableApp(rumps.App):
         if not output_file:
             return
         
+        wavetable_script = os.path.join(self.bundle_dir, "medusa_wavetable_tool.py")
         cmd = [
             sys.executable,
-            "medusa_wavetable_tool.py",
+            wavetable_script,
             "recompile",
             input_dir,
             "--output",
@@ -172,9 +183,10 @@ class MedusaWavetableApp(rumps.App):
         if not output_dir:
             return
         
+        preprocessor_script = os.path.join(self.bundle_dir, "medusa_wav_preprocessor.py")
         cmd = [
             sys.executable,
-            "medusa_wav_preprocessor.py",
+            preprocessor_script,
             input_dir,
             output_dir
         ]
