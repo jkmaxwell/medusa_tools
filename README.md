@@ -122,4 +122,12 @@ Feel free to submit issues, fork the repository, and create pull requests for an
 
 ### License
 
-MIT License - feel free to use and modify as needed.
+This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). This means:
+
+- ✔️ You can view and fork this code
+- ✔️ You can submit contributions via pull requests
+- ❌ You cannot use this code in commercial projects
+- ❌ You cannot modify or distribute this code without sharing your changes
+- ❌ You cannot use this code in closed-source projects
+
+All rights reserved. For permissions beyond the scope of this license, please contact the author.
