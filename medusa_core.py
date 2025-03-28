@@ -4,7 +4,6 @@ import os
 import wave
 import struct
 import shutil
-import numpy as np
 from pathlib import Path
 
 # Constants
@@ -226,10 +225,14 @@ def process_wavs(input_dir, output_dir):
                 
                 # Convert to mono if stereo
                 if wav_in.getnchannels() == 2:
-                    data = np.frombuffer(frames, dtype=np.int16)
-                    data = data.reshape(-1, 2)
-                    data = np.mean(data, axis=1, dtype=np.int16)
-                    frames = data.tobytes()
+                    # Manual stereo to mono conversion
+                    data = []
+                    for j in range(0, len(frames), 4):  # 4 bytes per stereo sample (2 channels * 2 bytes per sample)
+                        left = struct.unpack('<h', frames[j:j+2])[0]
+                        right = struct.unpack('<h', frames[j+2:j+4])[0]
+                        mono = (left + right) // 2
+                        data.extend(struct.pack('<h', mono))
+                    frames = bytes(data)
                 
                 # Write processed WAV
                 with wave.open(output_wav, 'wb') as wav_out:
