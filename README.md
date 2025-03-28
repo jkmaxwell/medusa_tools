@@ -21,10 +21,36 @@ The `medusa_wavetable_tool.py` script allows you to extract, modify, and recompi
 
 ### Installation
 
+#### Command Line Version
 1. Clone or download this repository
-2. Make the script executable:
+2. Make the scripts executable:
    ```bash
-   chmod +x medusa_wavetable_tool.py
+   chmod +x medusa_wavetable_tool.py medusa_wav_preprocessor.py
+   ```
+
+#### GUI Version (Python)
+1. Install the required dependencies:
+   ```bash
+   pip install tkinter
+   ```
+2. Run the GUI:
+   ```bash
+   python3 medusa_gui.py
+   ```
+
+#### Mac App Bundle
+1. Install PyInstaller:
+   ```bash
+   pip install pyinstaller
+   ```
+2. Build the app:
+   ```bash
+   pyinstaller medusa.spec
+   ```
+3. The app will be created in `dist/Medusa Wavetable Tool.app`
+4. Move the app to your Applications folder:
+   ```bash
+   mv "dist/Medusa Wavetable Tool.app" /Applications/
    ```
 
 ### Usage
