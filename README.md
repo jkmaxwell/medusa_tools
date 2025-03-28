@@ -29,15 +29,16 @@ The `medusa_wavetable_tool.py` script allows you to extract, modify, and recompi
    ```
 
 #### Native Mac App
-The tool is available as a native macOS menu bar app that provides a clean, native interface:
+The tool is available as a native macOS application with a simple interface:
 
 1. Download the latest release
 2. Move Medusa.app to your Applications folder
-3. Launch the app - it will appear in your menu bar as "M"
-4. Use the menu bar icon to:
+3. Launch the app
+4. Use the buttons to:
    - Decompile .polyend files
    - Recompile wavetables
    - Process custom WAV files
+   - View information about the tool
 
 #### Build from Source
 1. Create a virtual environment:
