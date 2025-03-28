@@ -33,7 +33,7 @@ The tool is available as a native macOS menu bar app that provides a clean, nati
 
 1. Download the latest release
 2. Move Medusa.app to your Applications folder
-3. Launch the app - it will appear in your menu bar as 🎹
+3. Launch the app - it will appear in your menu bar as "M"
 4. Use the menu bar icon to:
    - Decompile .polyend files
    - Recompile wavetables

@@ -9,7 +9,9 @@ from pathlib import Path
 
 class MedusaWavetableApp(rumps.App):
     def __init__(self):
-        super(MedusaWavetableApp, self).__init__("Medusa", icon="🎹")
+        super(MedusaWavetableApp, self).__init__("Medusa",
+                                                title="M",  # Simple text instead of icon
+                                                quit_button="Quit")
         
         # Decompile menu
         self.decompile_menu = rumps.MenuItem("Decompile Wavetable")
