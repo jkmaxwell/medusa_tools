@@ -3,17 +3,20 @@
 import sys
 from medusa_core import decompile_wavetable, recompile_wavetable, process_wavs
 
+DEFAULT_INPUT = "medusa64Wavetables.polyend"
+
 def show_help():
     print("""
 Medusa Wavetable Tool
 
 Usage:
-    medusa_mac.py decompile <input.polyend>
+    medusa_mac.py decompile [input.polyend]
     medusa_mac.py recompile <input_dir> <output.polyend>
     medusa_mac.py process <input_dir> <output_dir>
 
 Commands:
     decompile  Extract wavetables from .polyend file to WAV files
+               (defaults to medusa64Wavetables.polyend if not specified)
     recompile  Create .polyend file from WAV files
     process    Convert WAV files to Medusa-compatible format
     """)
@@ -26,12 +29,10 @@ def main():
     command = sys.argv[1]
     
     if command == 'decompile':
-        if len(sys.argv) != 3:
-            print("Error: decompile requires input file")
-            show_help()
-            return
+        # Use default input file if none specified
+        input_file = sys.argv[2] if len(sys.argv) > 2 else DEFAULT_INPUT
         
-        result = decompile_wavetable(sys.argv[2])
+        result = decompile_wavetable(input_file)
         if result['success']:
             print(f"\nDecompiling {result['num_wavetables']} wavetables to {result['output_dir']}...")
             for file in result['files']:
