@@ -99,7 +99,7 @@ gui_coll = COLLECT(
 app = BUNDLE(
     gui_coll,
     name='Medusa.app',
-    icon=None,
+    icon='icon.icns',
     bundle_identifier='com.code404.medusa',
     info_plist={
         'CFBundleDisplayName': 'Medusa Wavetable Tool',
