@@ -29,16 +29,16 @@ The `medusa_wavetable_tool.py` script allows you to extract, modify, and recompi
    ```
 
 #### Native Mac App
-The tool is available as a native macOS application with a simple interface:
+The tool is available as a native macOS application:
 
 1. Download the latest release
 2. Move Medusa.app to your Applications folder
-3. Launch the app
-4. Use the buttons to:
-   - Decompile .polyend files
-   - Recompile wavetables
+3. Right-click (or Control-click) on Medusa.app and select "Open"
+4. Click "Open" in the security dialog that appears
+5. Use the app to:
+   - Decompile .polyend files into WAV files
+   - Recompile WAV files into wavetables
    - Process custom WAV files
-   - View information about the tool
 
 #### Build from Source
 1. Create a virtual environment:
@@ -48,7 +48,7 @@ The tool is available as a native macOS application with a simple interface:
    ```
 2. Install dependencies:
    ```bash
-   pip install rumps pyinstaller
+   pip install PySide6 numpy
    ```
 3. Build the app:
    ```bash
@@ -71,8 +71,7 @@ Extract all wavetables from a `.polyend` file to individual WAV files:
 
 This creates a directory named `waves` containing:
 - 64 WAV files (wavetable_00.wav through wavetable_63.wav)
-- Metadata files (.id) for each wavetable
-- A copy of the original file for reference
+- Each WAV file contains a single cycle waveform
 
 #### Editing Wavetables
 
@@ -155,21 +154,6 @@ Offset  Size    Description
 0x0080  15872   Waveform data (raw 16-bit samples)
 ```
 
-### Tips
-
-1. Always make a backup of your original wavetable files before modifying them.
-2. When editing wavetables, maintain the single-cycle nature of the waveforms.
-3. The tool preserves all metadata and file structure, ensuring compatibility with the Medusa.
-
-### Troubleshooting
-
-If you encounter issues:
-
-1. Verify the input file is a valid Medusa wavetable file
-2. Check that edited WAV files remain mono 16-bit
-3. Ensure all 64 wavetables are present when recompiling
-4. Use the --verify-with option to check file integrity
-
 ### Testing
 
 The project includes a comprehensive test suite that verifies:
@@ -183,32 +167,16 @@ Run the tests:
 python3 test_medusa_tools.py -v
 ```
 
-All tests must pass before any changes are merged. The test suite ensures:
-- Byte-perfect wavetable handling
-- Correct WAV file format conversion
-- Proper error handling for invalid inputs
-- No regressions in core functionality
-
-### Support the Project
-
-If you find this tool useful, consider supporting its development:
-
-[![PayPal](https://img.shields.io/badge/PayPal-00457C?style=for-the-badge&logo=paypal&logoColor=white)](https://paypal.me/code404)
-[![Venmo](https://img.shields.io/badge/Venmo-008CFF?style=for-the-badge&logo=venmo&logoColor=white)](https://venmo.com/octavecat)
+All tests must pass before any changes are merged.
 
 ### Contributing
 
-When contributing to this project:
+Before submitting pull requests:
+1. Run the test suite to ensure no regressions
+2. Add tests for any new functionality
+3. Ensure all tests pass
 
-1. Fork the repository and create your feature branch
-2. Add or update tests for any new functionality
-3. Run the test suite to ensure no regressions:
-   ```bash
-   python3 test_medusa_tools.py -v
-   ```
-4. Create a pull request with a clear description of changes
-
-All pull requests must pass the test suite before being merged. This ensures the reliability of both the CLI tools and the Mac app.
+Feel free to submit issues, fork the repository, and create pull requests for any improvements.
 
 ### License
 

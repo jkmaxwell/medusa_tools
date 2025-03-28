@@ -72,11 +72,9 @@ class MedusaApp(QMainWindow):
             output_dir = os.path.join(input_dir, 'waves')
             os.makedirs(output_dir, exist_ok=True)
             
-            # Save a copy of the original file for reference
+            # Read the polyend file
             with open(input_file, 'rb') as f:
                 data = f.read()
-                with open(os.path.join(output_dir, 'original.polyend'), 'wb') as out:
-                    out.write(data)
             
             # Extract wavetables
             num_wavetables = len(data) // WAVETABLE_SIZE
