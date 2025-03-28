@@ -169,6 +169,25 @@ If you encounter issues:
 3. Ensure all 64 wavetables are present when recompiling
 4. Use the --verify-with option to check file integrity
 
+### Testing
+
+The project includes a comprehensive test suite that verifies:
+- Wavetable decompilation
+- Wavetable recompilation with verification
+- WAV file processing
+- Error handling
+
+Run the tests:
+```bash
+python3 test_medusa_tools.py -v
+```
+
+All tests must pass before any changes are merged. The test suite ensures:
+- Byte-perfect wavetable handling
+- Correct WAV file format conversion
+- Proper error handling for invalid inputs
+- No regressions in core functionality
+
 ### Support the Project
 
 If you find this tool useful, consider supporting its development:
@@ -178,7 +197,17 @@ If you find this tool useful, consider supporting its development:
 
 ### Contributing
 
-Feel free to submit issues, fork the repository, and create pull requests for any improvements.
+When contributing to this project:
+
+1. Fork the repository and create your feature branch
+2. Add or update tests for any new functionality
+3. Run the test suite to ensure no regressions:
+   ```bash
+   python3 test_medusa_tools.py -v
+   ```
+4. Create a pull request with a clear description of changes
+
+All pull requests must pass the test suite before being merged. This ensures the reliability of both the CLI tools and the Mac app.
 
 ### License
 
