@@ -28,29 +28,34 @@ The `medusa_wavetable_tool.py` script allows you to extract, modify, and recompi
    chmod +x medusa_wavetable_tool.py medusa_wav_preprocessor.py
    ```
 
-#### GUI Version (Python)
-1. Install the required dependencies:
-   ```bash
-   pip install tkinter
-   ```
-2. Run the GUI:
-   ```bash
-   python3 medusa_gui.py
-   ```
+#### Native Mac App
+The tool is available as a native macOS menu bar app that provides a clean, native interface:
 
-#### Standalone GUI Binary
-1. Install PyInstaller:
+1. Download the latest release
+2. Move Medusa.app to your Applications folder
+3. Launch the app - it will appear in your menu bar as 🎹
+4. Use the menu bar icon to:
+   - Decompile .polyend files
+   - Recompile wavetables
+   - Process custom WAV files
+
+#### Build from Source
+1. Create a virtual environment:
    ```bash
-   pip install pyinstaller
+   python3 -m venv venv
+   source venv/bin/activate
    ```
-2. Build the binary:
+2. Install dependencies:
+   ```bash
+   pip install rumps pyinstaller
+   ```
+3. Build the app:
    ```bash
    pyinstaller medusa.spec
    ```
-3. The executable will be created as `dist/medusa-wavetable-tool`
-4. Move it somewhere convenient and double-click to run:
+4. Move to Applications:
    ```bash
-   mv dist/medusa-wavetable-tool ~/Desktop/
+   mv "dist/Medusa.app" /Applications/
    ```
 
 ### Usage
