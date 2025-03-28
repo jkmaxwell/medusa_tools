@@ -1,2 +1,7 @@
 .DS_Store
 .gitattributes
+venv/
+build/
+dist/
+*.pyc
+__pycache__/
