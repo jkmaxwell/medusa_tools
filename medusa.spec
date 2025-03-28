@@ -7,11 +7,11 @@ common_analysis = {
     'pathex': [],
     'binaries': [],
     'datas': [('medusa_core.py', '.')],
-    'hiddenimports': ['numpy', 'numpy.core'],
+    'hiddenimports': [],
+    'excludes': ['PySide6', 'tkinter', 'PyQt5', 'PyQt6'],
     'hookspath': [],
     'hooksconfig': {},
     'runtime_hooks': [],
-    'excludes': [],
     'win_no_prefer_redirects': False,
     'win_private_assemblies': False,
     'cipher': block_cipher,
@@ -34,11 +34,13 @@ cli_exe = EXE(
     name='medusa_cli',
     debug=False,
     bootloader_ignore_signals=False,
+    runtime_tmpdir=None,
+    bootloader='bootloader/Darwin-64bit/run',
     strip=False,
     upx=True,
     console=True,
     disable_windowed_traceback=False,
-    argv_emulation=True,
+    argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
@@ -60,7 +62,7 @@ gui_a = Analysis(
     ['medusa_gui.py'],
     **{
         **common_analysis,
-        'hiddenimports': common_analysis['hiddenimports'] + ['PySide6.QtCore', 'PySide6.QtWidgets']
+        'hiddenimports': ['PySide6.QtCore', 'PySide6.QtWidgets', 'PySide6.QtGui', 'numpy', 'numpy.core']
     }
 )
 
@@ -71,7 +73,7 @@ gui_exe = EXE(
     gui_a.scripts,
     [],
     exclude_binaries=True,
-    name='Medusa',
+    name='Medusa_Wavetable_Utility',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -92,18 +94,18 @@ gui_coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='Medusa',
+    name='Medusa_Wavetable_Utility',
 )
 
 # Only create app bundle for GUI version
 app = BUNDLE(
     gui_coll,
-    name='Medusa.app',
+    name='Medusa Wavetable Utility.app',
     icon='icon.icns',
     bundle_identifier='com.code404.medusa',
     info_plist={
-        'CFBundleDisplayName': 'Medusa Waveform Utility',
-        'CFBundleName': 'Medusa Waveform Utility',
+        'CFBundleDisplayName': 'Medusa Wavetable Utility',
+        'CFBundleName': 'Medusa Wavetable Utility',
         'CFBundleShortVersionString': '1.0.0',
         'CFBundleVersion': '1.0.0',
         'NSHighResolutionCapable': 'True'
