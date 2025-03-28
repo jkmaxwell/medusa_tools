@@ -46,6 +46,35 @@ This creates a directory named `waves` containing:
 
 The extracted WAV files are standard 44.1kHz 16-bit mono files that can be edited in any audio editor. Each wavetable is a single cycle waveform.
 
+#### Processing Custom Wavetables
+
+The `medusa_wav_preprocessor.py` script helps prepare custom WAV files for use with Medusa:
+
+1. Converts files to the required format (44.1kHz, 16-bit mono)
+2. Extracts single-cycle waveforms at zero crossings
+3. Normalizes audio levels
+4. Limits to maximum 64 wavetables
+5. Creates necessary metadata files
+
+```bash
+# Process a folder of WAV files
+./medusa_wav_preprocessor.py input_waves/ processed_waves/
+
+# Then recompile into Medusa format
+./medusa_wavetable_tool.py recompile processed_waves/ --output custom_wavetables.polyend
+```
+
+Requirements:
+- Python 3.6 or higher
+- scipy
+- soundfile
+- numpy
+
+Install dependencies:
+```bash
+pip install scipy soundfile numpy
+```
+
 #### Recompiling Wavetables
 
 After editing the WAV files, recompile them back into a Medusa wavetable file:
