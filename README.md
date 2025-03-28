@@ -38,19 +38,19 @@ The `medusa_wavetable_tool.py` script allows you to extract, modify, and recompi
    python3 medusa_gui.py
    ```
 
-#### Mac App Bundle
+#### Standalone GUI Binary
 1. Install PyInstaller:
    ```bash
    pip install pyinstaller
    ```
-2. Build the app:
+2. Build the binary:
    ```bash
    pyinstaller medusa.spec
    ```
-3. The app will be created in `dist/Medusa Wavetable Tool.app`
-4. Move the app to your Applications folder:
+3. The executable will be created as `dist/medusa-wavetable-tool`
+4. Move it somewhere convenient and double-click to run:
    ```bash
-   mv "dist/Medusa Wavetable Tool.app" /Applications/
+   mv dist/medusa-wavetable-tool ~/Desktop/
    ```
 
 ### Usage
