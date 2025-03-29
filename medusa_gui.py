@@ -50,8 +50,9 @@ class MedusaApp(QMainWindow):
                 border-left-color: #404040;
                 border-right-color: #ffffff;
                 border-bottom-color: #ffffff;
-                margin-top: 8px;
-                padding-top: 16px;
+                margin: 4px;
+                padding: 8px;
+                spacing: 4px;
             }
             QGroupBox::title {
                 subcontrol-origin: margin;
@@ -155,12 +156,12 @@ class MedusaApp(QMainWindow):
         header_label.setPixmap(scaled_pixmap)
         
         layout = QVBoxLayout(central_widget)
-        layout.setSpacing(10)
-        layout.setContentsMargins(0, 0, 0, 10)
+        layout.setSpacing(4)  # Match the spacing from QGroupBox
+        layout.setContentsMargins(4, 0, 4, 4)  # Match the margins from QGroupBox
         layout.addWidget(header_label)
         
         # Set fixed window size
-        self.setFixedSize(450, 400 + scaled_pixmap.height())
+        self.setFixedSize(450, 200 + scaled_pixmap.height())
         
         # Create wavetable group
         create_group = QGroupBox("Create Wavetable")
