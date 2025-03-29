@@ -134,17 +134,6 @@ class MedusaApp(QMainWindow):
         layout.setSpacing(10)
         layout.setContentsMargins(10, 10, 10, 10)
         
-        # Add title
-        title = QLabel(APP_NAME)
-        title.setObjectName("titleLabel")
-        title.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(title)
-        
-        # Add description
-        desc = QLabel("A tool for working with Polyend Medusa wavetables")
-        desc.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        layout.addWidget(desc)
-        
         # Create wavetable group
         create_group = QGroupBox("Create Wavetable")
         create_layout = QVBoxLayout(create_group)
