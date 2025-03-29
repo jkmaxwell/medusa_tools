@@ -19,19 +19,24 @@ class MedusaApp(QMainWindow):
         
         # Set Windows 95 style directly
         self.setStyleSheet("""
-            QMainWindow, QMainWindow > QWidget {
+            QMainWindow {
                 border-image: url(:/images/background.png) 0 0 0 0 stretch stretch;
             }
-            QWidget { color: #000000; font-family: "MS Sans Serif", Arial; font-size: 12px; }
+            QWidget {
+                background: transparent;
+                color: #000000;
+                font-family: "MS Sans Serif", Arial;
+                font-size: 12px;
+            }
             QPushButton {
                 background-color: rgba(192, 192, 192, 0.7);
                 border: 2px solid #808080;
                 border-style: solid;
                 border-width: 2px;
-                border-top-color: #ffffff;
-                border-left-color: #ffffff;
-                border-right-color: #404040;
-                border-bottom-color: #404040;
+                border-top-color: #a0a0a0;
+                border-left-color: #a0a0a0;
+                border-right-color: #303030;
+                border-bottom-color: #303030;
                 padding: 3px 6px;
                 min-width: 85px;
                 font-family: "MS Sans Serif", Arial;
@@ -39,21 +44,22 @@ class MedusaApp(QMainWindow):
                 color: black;
             }
             QPushButton:pressed {
-                border-top-color: #404040;
-                border-left-color: #404040;
-                border-right-color: #ffffff;
-                border-bottom-color: #ffffff;
-                background-color: rgba(176, 176, 176, 0.7);
+                border-top-color: #303030;
+                border-left-color: #303030;
+                border-right-color: #a0a0a0;
+                border-bottom-color: #a0a0a0;
+                background-color: rgba(128, 128, 128, 0.7);
             }
             QGroupBox {
-                background-color: rgba(192, 192, 192, 0.6);
+                background-color: rgba(192, 192, 192, 0.85);
+                text-transform: uppercase;
                 border: 2px solid #808080;
                 border-style: solid;
                 border-width: 2px;
-                border-top-color: #404040;
-                border-left-color: #404040;
-                border-right-color: #ffffff;
-                border-bottom-color: #ffffff;
+                border-top-color: #303030;
+                border-left-color: #303030;
+                border-right-color: #a0a0a0;
+                border-bottom-color: #a0a0a0;
                 margin: 4px;
                 padding: 8px;
                 spacing: 4px;
@@ -93,18 +99,18 @@ class MedusaApp(QMainWindow):
                 background: transparent;
             }
             QMenuBar::item:selected {
-                background-color: #000080;
+                background-color: #404080;
                 color: #ffffff;
             }
             QMenu {
-                background-color: #c0c0c0;
+                background-color: rgba(192, 192, 192, 0.7);
                 border: 1px solid #808080;
                 border-style: solid;
                 border-width: 1px;
-                border-top-color: #ffffff;
-                border-left-color: #ffffff;
-                border-right-color: #404040;
-                border-bottom-color: #404040;
+                border-top-color: #a0a0a0;
+                border-left-color: #a0a0a0;
+                border-right-color: #303030;
+                border-bottom-color: #303030;
                 font-family: "MS Sans Serif", Arial;
                 font-size: 12px;
             }
@@ -168,7 +174,7 @@ class MedusaApp(QMainWindow):
         self.setFixedSize(450, 200 + scaled_pixmap.height())
         
         # Create wavetable group
-        create_group = QGroupBox("Create Wavetable")
+        create_group = QGroupBox("CREATE WAVETABLE")
         create_layout = QVBoxLayout(create_group)
         
         create_btn = QPushButton("Create from Audio Files")
@@ -198,7 +204,7 @@ class MedusaApp(QMainWindow):
         layout.addWidget(create_group)
         
         # Tools group
-        tools_group = QGroupBox("Tools")
+        tools_group = QGroupBox("TOOLS")
         tools_layout = QVBoxLayout(tools_group)
         
         decompile_btn = QPushButton("Decompile .polyend File")
