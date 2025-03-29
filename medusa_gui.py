@@ -37,6 +37,11 @@ class MedusaApp(QMainWindow):
         layout.addSpacing(20)
         
         # Add buttons
+        create_btn = QPushButton("Create from Audio Files")
+        create_btn.clicked.connect(self.select_create_input)
+        create_btn.setToolTip("Create wavetable bank directly from audio files")
+        layout.addWidget(create_btn)
+        
         decompile_btn = QPushButton("Decompile .polyend File")
         decompile_btn.clicked.connect(self.select_decompile_input)
         decompile_btn.setToolTip("Extract wavetables from a .polyend file to WAV files")
@@ -46,11 +51,6 @@ class MedusaApp(QMainWindow):
         recompile_btn.clicked.connect(self.select_recompile_input)
         recompile_btn.setToolTip("Create .polyend file from processed WAV files")
         layout.addWidget(recompile_btn)
-        
-        create_btn = QPushButton("Create from Audio Files")
-        create_btn.clicked.connect(self.select_create_input)
-        create_btn.setToolTip("Create wavetable bank directly from audio files")
-        layout.addWidget(create_btn)
         
         about_btn = QPushButton("About")
         about_btn.clicked.connect(self.about)
