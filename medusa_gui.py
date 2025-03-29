@@ -6,8 +6,8 @@ import resources_rc
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                               QPushButton, QLabel, QFileDialog, QMessageBox, QButtonGroup,
                               QRadioButton, QMenuBar, QMenu, QGroupBox, QStatusBar)
-from PySide6.QtCore import Qt, QSize
-from PySide6.QtGui import QPixmap
+from PySide6.QtCore import Qt, QSize, QUrl
+from PySide6.QtGui import QPixmap, QDesktopServices
 from medusa_core import decompile_wavetable, recompile_wavetable, process_wavs, create_wavetable_bank
 from version import __version__ as VERSION, __app_name__ as APP_NAME
 
@@ -212,9 +212,18 @@ class MedusaApp(QMainWindow):
         
         layout.addWidget(tools_group)
         
-        # Add status bar
+        # Add status bar with link
         status_bar = QStatusBar()
         self.setStatusBar(status_bar)
+        
+        # Create link label
+        link_label = QLabel()
+        link_label.setText('<a href="https://github.com/jkmaxwell/medusa_tools" style="color: #0000EE; text-decoration: underline;">2025 Justin Maxwell</a>')
+        link_label.setTextFormat(Qt.TextFormat.RichText)
+        link_label.setOpenExternalLinks(True)
+        
+        # Add permanent widget to right side of status bar
+        status_bar.addPermanentWidget(link_label)
         status_bar.showMessage("Ready")
     
     def update_status(self, message):
