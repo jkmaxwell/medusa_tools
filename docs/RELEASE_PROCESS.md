@@ -66,8 +66,11 @@ We follow [Semantic Versioning 2.0.0](https://semver.org/):
    # Build release artifacts
    pyinstaller --noconfirm medusa.spec
    
+   # Create release zip
+   cd dist && zip -r "Medusa_Wavetable_Utility_v{version}.zip" "Medusa Wavetable Utility.app" && cd ..
+   
    # Create release on GitHub
-   # Upload artifacts and release notes
+   # Upload artifacts (zip file) and release notes
    ```
 
 4. **Post-Release**
