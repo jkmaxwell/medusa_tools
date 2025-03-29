@@ -10,7 +10,6 @@ from PySide6.QtCore import Qt, QSize, QUrl
 from PySide6.QtGui import QPixmap, QDesktopServices
 from medusa_core import decompile_wavetable, recompile_wavetable, process_wavs, create_wavetable_bank
 from version import __version__ as VERSION, __app_name__ as APP_NAME
-from dependency_checker import check_ffmpeg
 
 class MedusaApp(QMainWindow):
     def __init__(self):
@@ -371,29 +370,12 @@ class MedusaApp(QMainWindow):
         about_box.setStyleSheet(self.styleSheet())
         about_box.exec()
 
-def check_dependencies():
-    """Check required dependencies before starting the app."""
-    ffmpeg_status = check_ffmpeg()
-    if not ffmpeg_status['installed']:
-        app = QApplication.instance() or QApplication(sys.argv)
-        title = f"{APP_NAME} - FFmpeg Required"
-        msg = QMessageBox()
-        msg.setWindowTitle(title)  # Set title first
-        msg.setIcon(QMessageBox.Critical)
-        msg.setText("FFmpeg is required but not found on your system.")
-        msg.setInformativeText(ffmpeg_status['error'])
-        msg.setDetailedText(ffmpeg_status['install_instructions'])
-        msg.setStandardButtons(QMessageBox.Close)
-        if msg.exec() == QMessageBox.StandardButton.Close:
-            sys.exit(1)
-
 def main():
     # Use existing QApplication instance if one exists
     app = QApplication.instance()
     if app is None:
         app = QApplication(sys.argv)
     
-    check_dependencies()
     window = MedusaApp()
     window.show()
     sys.exit(app.exec())
