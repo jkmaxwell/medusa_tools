@@ -6,6 +6,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                               QPushButton, QLabel, QFileDialog, QMessageBox, QButtonGroup,
                               QRadioButton, QMenuBar, QMenu, QGroupBox, QStatusBar)
 from PySide6.QtCore import Qt, QSize
+from PySide6.QtGui import QPixmap
 from medusa_core import decompile_wavetable, recompile_wavetable, process_wavs, create_wavetable_bank
 from version import __version__ as VERSION, __app_name__ as APP_NAME
 
@@ -13,7 +14,7 @@ class MedusaApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(f'{APP_NAME} v{VERSION}')
-        self.setFixedSize(450, 400)
+        self.setFixedSize(450, 400)  # Reduce window height since we removed header
         
         # Set Windows 95 style directly
         self.setStyleSheet("""
@@ -28,8 +29,10 @@ class MedusaApp(QMainWindow):
                 border-left-color: #ffffff;
                 border-right-color: #404040;
                 border-bottom-color: #404040;
-                padding: 4px 8px;
-                min-width: 75px;
+                padding: 3px 6px;
+                min-width: 85px;
+                font-family: "MS Sans Serif", Arial;
+                font-size: 12px;
                 color: black;
             }
             QPushButton:pressed {
@@ -58,56 +61,72 @@ class MedusaApp(QMainWindow):
                 padding: 0 3px;
             }
             QRadioButton {
-                spacing: 8px;
+                spacing: 6px;
+                font-family: "MS Sans Serif", Arial;
+                font-size: 12px;
             }
             QRadioButton::indicator {
-                width: 12px;
-                height: 12px;
-                border: 2px solid #808080;
+                width: 13px;
+                height: 13px;
+                border: 1px solid #808080;
                 border-radius: 7px;
-                background-color: #c0c0c0;
+                background-color: #ffffff;
             }
             QRadioButton::indicator:checked {
-                background-color: #000080;
-                border: 2px solid #808080;
+                background-color: #000000;
+                border: 1px solid #808080;
+                border-radius: 7px;
             }
             QMenuBar {
                 background-color: #c0c0c0;
-                border-bottom: 2px solid #808080;
+                border-bottom: 1px solid #808080;
+                font-family: "MS Sans Serif", Arial;
+                font-size: 12px;
             }
             QMenuBar::item {
-                spacing: 6px;
-                padding: 3px 6px;
+                spacing: 4px;
+                padding: 2px 6px;
                 background: transparent;
             }
             QMenuBar::item:selected {
                 background-color: #000080;
-                color: white;
+                color: #ffffff;
             }
             QMenu {
                 background-color: #c0c0c0;
-                border: 2px solid #808080;
+                border: 1px solid #808080;
                 border-style: solid;
-                border-width: 2px;
+                border-width: 1px;
                 border-top-color: #ffffff;
                 border-left-color: #ffffff;
                 border-right-color: #404040;
                 border-bottom-color: #404040;
+                font-family: "MS Sans Serif", Arial;
+                font-size: 12px;
             }
             QMenu::item {
-                padding: 4px 20px;
+                padding: 2px 25px 2px 20px;
             }
             QMenu::item:selected {
                 background-color: #000080;
-                color: white;
+                color: #ffffff;
             }
             QStatusBar {
                 background-color: #c0c0c0;
-                border-top: 2px solid #808080;
+                border-top: 1px solid #808080;
+                border-style: solid;
+                border-width: 1px;
+                border-top-color: #404040;
+                border-left-color: #404040;
+                border-right-color: #ffffff;
+                border-bottom-color: #ffffff;
+                font-family: "MS Sans Serif", Arial;
+                font-size: 12px;
+                padding: 2px 3px;
             }
             QLabel { background: transparent; }
             QLabel#titleLabel {
-                font-size: 14px;
+                font-size: 12px;
                 font-weight: bold;
                 color: #000080;
             }
@@ -140,7 +159,8 @@ class MedusaApp(QMainWindow):
         
         create_btn = QPushButton("Create from Audio Files")
         create_btn.clicked.connect(self.select_create_input)
-        create_btn.setToolTip("Create wavetable bank directly from audio files")
+        create_btn.setToolTip("Create wavetable bank directly from audio files (C)")
+        create_btn.setShortcut("C")
         create_layout.addWidget(create_btn)
         
         # Selection mode radio buttons
@@ -170,11 +190,13 @@ class MedusaApp(QMainWindow):
         decompile_btn = QPushButton("Decompile .polyend File")
         decompile_btn.clicked.connect(self.select_decompile_input)
         decompile_btn.setToolTip("Extract wavetables from a .polyend file to WAV files")
+        decompile_btn.setShortcut("D")
         tools_layout.addWidget(decompile_btn)
         
         recompile_btn = QPushButton("Recompile Wavetables")
         recompile_btn.clicked.connect(self.select_recompile_input)
-        recompile_btn.setToolTip("Create .polyend file from processed WAV files")
+        recompile_btn.setToolTip("Create .polyend file from processed WAV files (R)")
+        recompile_btn.setShortcut("R")
         tools_layout.addWidget(recompile_btn)
         
         layout.addWidget(tools_group)
