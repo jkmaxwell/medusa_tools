@@ -6,10 +6,13 @@ block_cipher = None
 common_analysis = {
     'pathex': [],
     'binaries': [],
-    'datas': [('medusa_core.py', '.')],
+    'datas': [
+        ('medusa_core.py', '.'),
+        ('version.py', '.')
+    ],
     'hiddenimports': [],
-    'excludes': ['PySide6', 'tkinter', 'PyQt5', 'PyQt6'],
-    'hookspath': [],
+    'excludes': ['tkinter', 'PyQt5', 'PyQt6'],
+    'hookspath': ['/Users/jkm/dev/medusa_tools/venv/lib/python3.13/site-packages/PyInstaller/hooks'],
     'hooksconfig': {},
     'runtime_hooks': [],
     'win_no_prefer_redirects': False,
@@ -62,7 +65,15 @@ gui_a = Analysis(
     ['medusa_gui.py'],
     **{
         **common_analysis,
-        'hiddenimports': ['PySide6.QtCore', 'PySide6.QtWidgets', 'PySide6.QtGui', 'numpy', 'numpy.core']
+        'hiddenimports': [
+            'PySide6',
+            'PySide6.QtCore',
+            'PySide6.QtWidgets',
+            'PySide6.QtGui',
+            'shiboken6',
+            'numpy',
+            'numpy.core'
+        ]
     }
 )
 

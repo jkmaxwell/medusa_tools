@@ -15,10 +15,103 @@ class MedusaApp(QMainWindow):
         self.setWindowTitle(f'{APP_NAME} v{VERSION}')
         self.setFixedSize(450, 400)
         
-        # Load Windows 95 style
-        style_file = os.path.join(os.path.dirname(__file__), "styles/win95.qss")
-        with open(style_file) as f:
-            self.setStyleSheet(f.read())
+        # Set Windows 95 style directly
+        self.setStyleSheet("""
+            QMainWindow { background-color: #c0c0c0; }
+            QWidget { background-color: #c0c0c0; color: #000000; font-family: "MS Sans Serif", Arial; font-size: 12px; }
+            QPushButton {
+                background-color: #c0c0c0;
+                border: 2px solid #808080;
+                border-style: solid;
+                border-width: 2px;
+                border-top-color: #ffffff;
+                border-left-color: #ffffff;
+                border-right-color: #404040;
+                border-bottom-color: #404040;
+                padding: 4px 8px;
+                min-width: 75px;
+                color: black;
+            }
+            QPushButton:pressed {
+                border-top-color: #404040;
+                border-left-color: #404040;
+                border-right-color: #ffffff;
+                border-bottom-color: #ffffff;
+                background-color: #b0b0b0;
+            }
+            QGroupBox {
+                background-color: #c0c0c0;
+                border: 2px solid #808080;
+                border-style: solid;
+                border-width: 2px;
+                border-top-color: #404040;
+                border-left-color: #404040;
+                border-right-color: #ffffff;
+                border-bottom-color: #ffffff;
+                margin-top: 8px;
+                padding-top: 16px;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                subcontrol-position: top left;
+                left: 8px;
+                padding: 0 3px;
+            }
+            QRadioButton {
+                spacing: 8px;
+            }
+            QRadioButton::indicator {
+                width: 12px;
+                height: 12px;
+                border: 2px solid #808080;
+                border-radius: 7px;
+                background-color: #c0c0c0;
+            }
+            QRadioButton::indicator:checked {
+                background-color: #000080;
+                border: 2px solid #808080;
+            }
+            QMenuBar {
+                background-color: #c0c0c0;
+                border-bottom: 2px solid #808080;
+            }
+            QMenuBar::item {
+                spacing: 6px;
+                padding: 3px 6px;
+                background: transparent;
+            }
+            QMenuBar::item:selected {
+                background-color: #000080;
+                color: white;
+            }
+            QMenu {
+                background-color: #c0c0c0;
+                border: 2px solid #808080;
+                border-style: solid;
+                border-width: 2px;
+                border-top-color: #ffffff;
+                border-left-color: #ffffff;
+                border-right-color: #404040;
+                border-bottom-color: #404040;
+            }
+            QMenu::item {
+                padding: 4px 20px;
+            }
+            QMenu::item:selected {
+                background-color: #000080;
+                color: white;
+            }
+            QStatusBar {
+                background-color: #c0c0c0;
+                border-top: 2px solid #808080;
+            }
+            QLabel { background: transparent; }
+            QLabel#titleLabel {
+                font-size: 14px;
+                font-weight: bold;
+                color: #000080;
+            }
+        """)
         
         # Create menu bar
         menubar = QMenuBar()
