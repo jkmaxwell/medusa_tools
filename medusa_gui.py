@@ -14,7 +14,6 @@ class MedusaApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(f'{APP_NAME} v{VERSION}')
-        self.setFixedSize(450, 400)  # Reduce window height since we removed header
         
         # Set Windows 95 style directly
         self.setStyleSheet("""
@@ -149,9 +148,19 @@ class MedusaApp(QMainWindow):
         # Create central widget and layout
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
+        # Add header image
+        header_label = QLabel()
+        pixmap = QPixmap("images/header.png")
+        scaled_pixmap = pixmap.scaled(450, pixmap.height(), Qt.AspectRatioMode.KeepAspectRatio)
+        header_label.setPixmap(scaled_pixmap)
+        
         layout = QVBoxLayout(central_widget)
         layout.setSpacing(10)
-        layout.setContentsMargins(10, 10, 10, 10)
+        layout.setContentsMargins(0, 0, 0, 10)
+        layout.addWidget(header_label)
+        
+        # Set fixed window size
+        self.setFixedSize(450, 400 + scaled_pixmap.height())
         
         # Create wavetable group
         create_group = QGroupBox("Create Wavetable")
