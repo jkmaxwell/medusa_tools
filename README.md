@@ -17,9 +17,27 @@ The `medusa_wavetable_tool.py` script allows you to extract, modify, and recompi
 ### Requirements
 
 - Python 3.6 or higher
+- FFmpeg (required for audio file conversion)
 - Standard Python libraries (no additional dependencies needed)
 
 ### Installation
+
+#### FFmpeg Installation (Required)
+
+FFmpeg is required for audio file conversion. To install FFmpeg on macOS:
+
+Using Homebrew (recommended):
+```bash
+# Install Homebrew if not already installed
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Install FFmpeg
+brew install ffmpeg
+```
+
+Alternative methods:
+- Download from [FFmpeg website](https://ffmpeg.org/download.html)
+- Using MacPorts: `sudo port install ffmpeg`
 
 #### Command Line Version
 1. Clone or download this repository
