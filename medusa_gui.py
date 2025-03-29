@@ -2,6 +2,7 @@
 
 import sys
 import os
+import resources_rc
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                               QPushButton, QLabel, QFileDialog, QMessageBox, QButtonGroup,
                               QRadioButton, QMenuBar, QMenu, QGroupBox, QStatusBar)
@@ -151,7 +152,7 @@ class MedusaApp(QMainWindow):
         self.setCentralWidget(central_widget)
         # Add header image
         header_label = QLabel()
-        pixmap = QPixmap("images/header.png")
+        pixmap = QPixmap(":/images/header.png")
         scaled_pixmap = pixmap.scaled(450, pixmap.height(), Qt.AspectRatioMode.KeepAspectRatio)
         header_label.setPixmap(scaled_pixmap)
         

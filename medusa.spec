@@ -8,8 +8,10 @@ common_analysis = {
     'binaries': [],
     'datas': [
         ('medusa_core.py', '.'),
-        ('version.py', '.')
+        ('version.py', '.'),
+        ('styles', 'styles')
     ],
+    'hiddenimports': ['resources_rc'],
     'hiddenimports': [],
     'excludes': ['tkinter', 'PyQt5', 'PyQt6'],
     'hookspath': ['/Users/jkm/dev/medusa_tools/venv/lib/python3.13/site-packages/PyInstaller/hooks'],
