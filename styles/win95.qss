@@ -1,0 +1,135 @@
+/* Windows 95 Style Sheet */
+
+QMainWindow {
+    background-color: #c0c0c0;
+}
+
+QWidget {
+    background-color: #c0c0c0;
+    color: #000000;
+    font-family: "MS Sans Serif", Arial;
+    font-size: 12px;
+}
+
+QPushButton {
+    background-color: #c0c0c0;
+    border: 2px solid #808080;
+    border-style: solid;
+    border-width: 2px;
+    border-top-color: #ffffff;
+    border-left-color: #ffffff;
+    border-right-color: #404040;
+    border-bottom-color: #404040;
+    padding: 4px 8px;
+    min-width: 75px;
+    color: black;
+}
+
+QPushButton:pressed {
+    border-top-color: #404040;
+    border-left-color: #404040;
+    border-right-color: #ffffff;
+    border-bottom-color: #ffffff;
+    background-color: #b0b0b0;
+}
+
+QPushButton:disabled {
+    color: #808080;
+    background-color: #c0c0c0;
+}
+
+QGroupBox {
+    background-color: #c0c0c0;
+    border: 2px solid #808080;
+    border-style: solid;
+    border-width: 2px;
+    border-top-color: #404040;
+    border-left-color: #404040;
+    border-right-color: #ffffff;
+    border-bottom-color: #ffffff;
+    margin-top: 8px;
+    padding-top: 16px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 8px;
+    padding: 0 3px;
+}
+
+QRadioButton {
+    spacing: 8px;
+}
+
+QRadioButton::indicator {
+    width: 13px;
+    height: 13px;
+}
+
+QRadioButton::indicator::unchecked {
+    image: url(styles/images/radiobutton_unchecked.png);
+}
+
+QRadioButton::indicator::checked {
+    image: url(styles/images/radiobutton_checked.png);
+}
+
+QMenuBar {
+    background-color: #c0c0c0;
+    border-bottom: 2px solid #808080;
+    border-bottom-style: solid;
+}
+
+QMenuBar::item {
+    spacing: 6px;
+    padding: 3px 6px;
+    background: transparent;
+}
+
+QMenuBar::item:selected {
+    background-color: #000080;
+    color: white;
+}
+
+QMenu {
+    background-color: #c0c0c0;
+    border: 2px solid #808080;
+    border-style: solid;
+    border-width: 2px;
+    border-top-color: #ffffff;
+    border-left-color: #ffffff;
+    border-right-color: #404040;
+    border-bottom-color: #404040;
+}
+
+QMenu::item {
+    padding: 4px 20px;
+}
+
+QMenu::item:selected {
+    background-color: #000080;
+    color: white;
+}
+
+QMenu::separator {
+    height: 2px;
+    background: #808080;
+    margin: 4px 0;
+}
+
+QStatusBar {
+    background-color: #c0c0c0;
+    border-top: 2px solid #808080;
+    border-top-style: solid;
+}
+
+QLabel {
+    background: transparent;
+}
+
+QLabel#titleLabel {
+    font-size: 14px;
+    font-weight: bold;
+    color: #000080;
+}
