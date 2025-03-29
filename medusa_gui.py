@@ -19,7 +19,10 @@ class MedusaApp(QMainWindow):
         
         # Set Windows 95 style directly
         self.setStyleSheet("""
-            QMainWindow, QMainWindow > QWidget { background-color: yellow; }
+            QMainWindow, QMainWindow > QWidget {
+                background: url(:/images/background.png) no-repeat center center fixed;
+                background-size: cover;
+            }
             QWidget { background-color: #c0c0c0; color: #000000; font-family: "MS Sans Serif", Arial; font-size: 12px; }
             QPushButton {
                 background-color: #c0c0c0;
