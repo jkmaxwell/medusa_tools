@@ -10,11 +10,25 @@ from PySide6.QtCore import Qt, QSize, QUrl
 from PySide6.QtGui import QPixmap, QDesktopServices
 from medusa_core import decompile_wavetable, recompile_wavetable, process_wavs, create_wavetable_bank
 from version import __version__ as VERSION, __app_name__ as APP_NAME
+from dependency_checker import check_ffmpeg
 
 class MedusaApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle(f'{APP_NAME} v{VERSION}')
+        
+        # Check for ffmpeg before proceeding
+        ffmpeg_status = check_ffmpeg()
+        if not ffmpeg_status['installed']:
+            msg = QMessageBox(self)
+            msg.setIcon(QMessageBox.Critical)
+            msg.setWindowTitle("FFmpeg Required")
+            msg.setText("FFmpeg is required but not found on your system.")
+            msg.setInformativeText(ffmpeg_status['error'])
+            msg.setDetailedText(ffmpeg_status['install_instructions'])
+            msg.setStandardButtons(QMessageBox.Close)
+            msg.exec()
+            sys.exit(1)
         
         # Set Windows 95 style directly
         self.setStyleSheet("""
