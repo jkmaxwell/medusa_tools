@@ -39,6 +39,13 @@ Alternative methods:
 - Download from [FFmpeg website](https://ffmpeg.org/download.html)
 - Using MacPorts: `sudo port install ffmpeg`
 
+The application will automatically detect FFmpeg in common installation locations:
+- Homebrew: /usr/local/bin/ffmpeg
+- MacPorts: /opt/local/bin/ffmpeg
+- System: /usr/bin/ffmpeg
+
+If FFmpeg is installed but not found, ensure it's properly linked in your PATH or contact support with the installation location.
+
 #### Command Line Version
 1. Clone or download this repository
 2. Make the scripts executable:

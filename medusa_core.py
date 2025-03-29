@@ -244,8 +244,15 @@ def create_wavetable_bank(input_dir, output_file, random_order=False, temp_dir='
         for i, audio_file in enumerate(audio_files):
             output_wav = os.path.join(temp_dir, f'temp_{i:02d}.wav')
             try:
+                # Get ffmpeg path from dependency checker
+                from dependency_checker import check_ffmpeg
+                ffmpeg_check = check_ffmpeg()
+                if not ffmpeg_check['installed']:
+                    raise Exception(f"FFmpeg error: {ffmpeg_check['error']}")
+                
+                ffmpeg_path = ffmpeg_check['path']
                 subprocess.run([
-                    'ffmpeg', '-y',
+                    ffmpeg_path, '-y',
                     '-i', audio_file,
                     '-ar', '44100',
                     '-ac', '1',
