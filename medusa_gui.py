@@ -7,9 +7,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                               QRadioButton)
 from PySide6.QtCore import Qt
 from medusa_core import decompile_wavetable, recompile_wavetable, process_wavs
-
-VERSION = "1.0.0"
-APP_NAME = "Medusa Wavetable Utility"
+from version import __version__ as VERSION, __app_name__ as APP_NAME
 
 class MedusaApp(QMainWindow):
     def __init__(self):
