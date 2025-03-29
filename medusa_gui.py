@@ -20,12 +20,11 @@ class MedusaApp(QMainWindow):
         # Set Windows 95 style directly
         self.setStyleSheet("""
             QMainWindow, QMainWindow > QWidget {
-                background: url(:/images/background.png) no-repeat center center fixed;
-                background-size: cover;
+                border-image: url(:/images/background.png) 0 0 0 0 stretch stretch;
             }
-            QWidget { background-color: #c0c0c0; color: #000000; font-family: "MS Sans Serif", Arial; font-size: 12px; }
+            QWidget { color: #000000; font-family: "MS Sans Serif", Arial; font-size: 12px; }
             QPushButton {
-                background-color: #c0c0c0;
+                background-color: rgba(192, 192, 192, 0.7);
                 border: 2px solid #808080;
                 border-style: solid;
                 border-width: 2px;
@@ -44,10 +43,10 @@ class MedusaApp(QMainWindow):
                 border-left-color: #404040;
                 border-right-color: #ffffff;
                 border-bottom-color: #ffffff;
-                background-color: #b0b0b0;
+                background-color: rgba(176, 176, 176, 0.7);
             }
             QGroupBox {
-                background-color: #c0c0c0;
+                background-color: rgba(192, 192, 192, 0.6);
                 border: 2px solid #808080;
                 border-style: solid;
                 border-width: 2px;
