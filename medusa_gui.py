@@ -2,8 +2,9 @@
 
 import sys
 import os
-from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
-                              QPushButton, QLabel, QFileDialog, QMessageBox)
+from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+                              QPushButton, QLabel, QFileDialog, QMessageBox, QButtonGroup,
+                              QRadioButton)
 from PySide6.QtCore import Qt
 from medusa_core import decompile_wavetable, recompile_wavetable, process_wavs
 
@@ -36,11 +37,38 @@ class MedusaApp(QMainWindow):
         # Add spacing
         layout.addSpacing(20)
         
-        # Add buttons
+        # Create from Audio Files section
+        create_section = QWidget()
+        create_layout = QVBoxLayout(create_section)
+        create_layout.setSpacing(5)
+        
         create_btn = QPushButton("Create from Audio Files")
         create_btn.clicked.connect(self.select_create_input)
         create_btn.setToolTip("Create wavetable bank directly from audio files")
-        layout.addWidget(create_btn)
+        create_layout.addWidget(create_btn)
+        
+        # Selection mode radio buttons
+        mode_group = QWidget()
+        mode_layout = QHBoxLayout(mode_group)
+        mode_layout.setContentsMargins(20, 0, 0, 0)  # Add left margin for indentation
+        
+        self.selection_group = QButtonGroup(self)
+        alpha_radio = QRadioButton("Alphanumeric")
+        random_radio = QRadioButton("Random")
+        alpha_radio.setChecked(True)  # Default to alphanumeric
+        
+        self.selection_group.addButton(alpha_radio)
+        self.selection_group.addButton(random_radio)
+        
+        mode_layout.addWidget(alpha_radio)
+        mode_layout.addWidget(random_radio)
+        mode_layout.addStretch()
+        
+        create_layout.addWidget(mode_group)
+        layout.addWidget(create_section)
+        
+        # Add spacing after the create section
+        layout.addSpacing(10)
         
         decompile_btn = QPushButton("Decompile .polyend File")
         decompile_btn.clicked.connect(self.select_decompile_input)
@@ -128,23 +156,8 @@ class MedusaApp(QMainWindow):
         if not input_dir:
             return
             
-        # Ask for selection mode
-        msg = QMessageBox(self)
-        msg.setWindowTitle("File Selection Mode")
-        msg.setText("How would you like to select the audio files?")
-        msg.setInformativeText("Choose between alphabetical order or random selection.")
-        alpha_btn = msg.addButton("Alphabetical", QMessageBox.ButtonRole.AcceptRole)
-        random_btn = msg.addButton("Random", QMessageBox.ButtonRole.AcceptRole)
-        cancel_btn = msg.addButton(QMessageBox.StandardButton.Cancel)
-        msg.setDefaultButton(alpha_btn)
-        
-        msg.exec()
-        clicked_button = msg.clickedButton()
-        
-        if clicked_button == cancel_btn:
-            return
-            
-        random_mode = (clicked_button == random_btn)
+        # Get selection mode from radio buttons
+        random_mode = self.selection_group.checkedButton().text() == "Random"
         
         # Get output file location
         output_file, _ = QFileDialog.getSaveFileName(
