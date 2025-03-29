@@ -17,19 +17,6 @@ class MedusaApp(QMainWindow):
         super().__init__()
         self.setWindowTitle(f'{APP_NAME} v{VERSION}')
         
-        # Check for ffmpeg before proceeding
-        ffmpeg_status = check_ffmpeg()
-        if not ffmpeg_status['installed']:
-            msg = QMessageBox(self)
-            msg.setIcon(QMessageBox.Critical)
-            msg.setWindowTitle("FFmpeg Required")
-            msg.setText("FFmpeg is required but not found on your system.")
-            msg.setInformativeText(ffmpeg_status['error'])
-            msg.setDetailedText(ffmpeg_status['install_instructions'])
-            msg.setStandardButtons(QMessageBox.Close)
-            msg.exec()
-            sys.exit(1)
-        
         # Set Windows 95 style directly
         self.setStyleSheet("""
             QMainWindow { background-color: #c0c0c0; }
@@ -376,8 +363,29 @@ class MedusaApp(QMainWindow):
         about_box.setStyleSheet(self.styleSheet())
         about_box.exec()
 
+def check_dependencies():
+    """Check required dependencies before starting the app."""
+    ffmpeg_status = check_ffmpeg()
+    if not ffmpeg_status['installed']:
+        app = QApplication.instance() or QApplication(sys.argv)
+        title = f"{APP_NAME} - FFmpeg Required"
+        msg = QMessageBox()
+        msg.setWindowTitle(title)  # Set title first
+        msg.setIcon(QMessageBox.Critical)
+        msg.setText("FFmpeg is required but not found on your system.")
+        msg.setInformativeText(ffmpeg_status['error'])
+        msg.setDetailedText(ffmpeg_status['install_instructions'])
+        msg.setStandardButtons(QMessageBox.Close)
+        if msg.exec() == QMessageBox.StandardButton.Close:
+            sys.exit(1)
+
 def main():
-    app = QApplication(sys.argv)
+    # Use existing QApplication instance if one exists
+    app = QApplication.instance()
+    if app is None:
+        app = QApplication(sys.argv)
+    
+    check_dependencies()
     window = MedusaApp()
     window.show()
     sys.exit(app.exec())
