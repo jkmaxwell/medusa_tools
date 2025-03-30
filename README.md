@@ -37,8 +37,9 @@ The tool will automatically detect FFmpeg in common installation locations:
 - MacPorts: /opt/local/bin/ffmpeg
 - System: /usr/bin/ffmpeg
 
-Please watch this:
-https://www.loom.com/share/3f718f692a5c465cb3c0d09050ec9560
+Please click watch this intro:
+
+[![CLI Intro](https://cdn.loom.com/sessions/thumbnails/3f718f692a5c465cb3c0d09050ec9560-162fb22de36196ca.jpg)](https://www.loom.com/share/3f718f692a5c465cb3c0d09050ec9560)
 
 ## Quick Start
 
