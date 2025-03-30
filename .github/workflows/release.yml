@@ -22,11 +22,11 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
           
-      - name: Build application
+      - name: Build CLI tool
         run: |
-          pyinstaller --noconfirm medusa.spec
-          cd release
-          zip -r medusa_tools_${{ github.ref_name }}_macos.zip "Medusa Wavetable Utility"
+          pyinstaller --name medusa_cli --onefile medusa_cli.py
+          cd dist
+          zip -r medusa_cli_${{ github.ref_name }}_macos.zip medusa_cli
           
       - name: Generate release notes
         run: |
@@ -36,7 +36,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            release/medusa_tools_${{ github.ref_name }}_macos.zip
+            dist/medusa_cli_${{ github.ref_name }}_macos.zip
           body_path: RELEASE_NOTES.md
           draft: false
           prerelease: false
