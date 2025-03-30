@@ -174,7 +174,7 @@ class MedusaApp(QMainWindow):
         
         # Create wavetable group
         create_group = QGroupBox("CREATE WAVETABLE")
-        create_group.setStyleSheet("QGroupBox { background-color: rgba(0, 0, 0, 0.5); }")
+        create_group.setStyleSheet("QGroupBox { background-color: rgba(255, 255, 255, 0.3); }")
         create_layout = QVBoxLayout(create_group)
         
         create_btn = QPushButton("Create from Audio Files")
@@ -205,7 +205,7 @@ class MedusaApp(QMainWindow):
         
         # Tools group
         tools_group = QGroupBox("TOOLS")
-        tools_group.setStyleSheet("QGroupBox { background-color: rgba(0, 0, 0, 0.5); }")
+        tools_group.setStyleSheet("QGroupBox { background-color: rgba(255, 255, 255, 0.3); }")
         tools_layout = QVBoxLayout(tools_group)
         
         decompile_btn = QPushButton("Decompile .polyend File")
