@@ -4,8 +4,11 @@
 import os
 import re
 import sys
+import json
 import datetime
+import urllib.request
 from pathlib import Path
+from packaging import version
 
 def get_version_file():
     """Get the path to version.py."""
@@ -75,6 +78,41 @@ def update_version_file(new_version, changes):
     with open(version_file, 'w') as f:
         f.write(content)
 
+def get_latest_github_release():
+    """Fetch the latest release information from GitHub."""
+    url = "https://api.github.com/repos/jkmaxwell/medusa_tools/releases/latest"
+    try:
+        with urllib.request.urlopen(url) as response:
+            data = json.loads(response.read().decode())
+            return {
+                'version': data['tag_name'].lstrip('v'),
+                'url': data['html_url'],
+                'notes': data['body']
+            }
+    except Exception as e:
+        print(f"Warning: Could not fetch latest version: {e}")
+        return None
+
+def check_for_updates():
+    """Check if a newer version is available on GitHub."""
+    current = read_version()
+    latest_release = get_latest_github_release()
+    
+    if not latest_release:
+        return None
+        
+    current_ver = version.parse(current)
+    latest_ver = version.parse(latest_release['version'])
+    
+    if latest_ver > current_ver:
+        return {
+            'current_version': current,
+            'latest_version': latest_release['version'],
+            'download_url': latest_release['url'],
+            'release_notes': latest_release['notes']
+        }
+    return None
+
 def generate_release_notes(version):
     """Generate release notes for the specified version."""
     version_file = get_version_file()
@@ -106,11 +144,25 @@ def main():
         print("Usage:")
         print("  version_manager.py bump [major|minor|patch]")
         print("  version_manager.py notes <version>")
+        print("  version_manager.py check")
         sys.exit(1)
     
     command = sys.argv[1]
     
-    if command == "bump":
+    if command == "check":
+        update_info = check_for_updates()
+        if update_info:
+            print(f"\nUpdate available!")
+            print(f"Current version: {update_info['current_version']}")
+            print(f"Latest version:  {update_info['latest_version']}")
+            print(f"\nDownload: {update_info['download_url']}")
+            print("\nRelease Notes:")
+            print(update_info['release_notes'])
+        else:
+            current = read_version()
+            print(f"\nYou're up to date! (Version {current})")
+    
+    elif command == "bump":
         version_type = sys.argv[2] if len(sys.argv) > 2 else "patch"
         new_version = bump_version(version_type)
         print(f"Bumped version to {new_version}")

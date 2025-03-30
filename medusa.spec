@@ -9,10 +9,10 @@ common_analysis = {
     'datas': [
         ('medusa_core.py', '.'),
         ('version.py', '.'),
-        ('styles', 'styles')
+        ('styles', 'styles'),
+        ('tools/version_manager.py', 'tools')
     ],
-    'hiddenimports': ['resources_rc'],
-    'hiddenimports': [],
+    'hiddenimports': ['resources_rc', 'packaging', 'packaging.version'],
     'excludes': ['tkinter', 'PyQt5', 'PyQt6'],
     'hookspath': ['/Users/jkm/dev/medusa_tools/venv/lib/python3.13/site-packages/PyInstaller/hooks'],
     'hooksconfig': {},
@@ -25,7 +25,7 @@ common_analysis = {
 
 # CLI version
 cli_a = Analysis(
-    ['medusa_mac.py'],
+    ['medusa_cli.py'],
     **common_analysis
 )
 

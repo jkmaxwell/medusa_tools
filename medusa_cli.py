@@ -5,6 +5,7 @@ import sys
 import argparse
 from medusa_core import decompile_wavetable, recompile_wavetable, process_wavs, create_wavetable_bank
 from version import __version__, __app_name__
+from tools.version_manager import check_for_updates, bump_version, generate_release_notes
 
 def main():
     """Main CLI entry point."""
@@ -63,6 +64,40 @@ def main():
         help='Use random file selection (default: alphabetical)'
     )
     
+    # Version management commands
+    version_parser = subparsers.add_parser(
+        'version',
+        help='Version management commands'
+    )
+    version_subparsers = version_parser.add_subparsers(dest='version_command', help='Version commands')
+    
+    # Check for updates
+    check_parser = version_subparsers.add_parser(
+        'check',
+        help='Check for available updates'
+    )
+    
+    # Bump version
+    bump_parser = version_subparsers.add_parser(
+        'bump',
+        help='Bump version number'
+    )
+    bump_parser.add_argument(
+        'bump_type',
+        choices=['major', 'minor', 'patch'],
+        help='Version component to bump'
+    )
+    
+    # Generate release notes
+    notes_parser = version_subparsers.add_parser(
+        'notes',
+        help='Generate release notes'
+    )
+    notes_parser.add_argument(
+        'version',
+        help='Version to generate notes for'
+    )
+    
     args = parser.parse_args()
     
     if not args.command:
@@ -100,6 +135,48 @@ def main():
             else:
                 print(f"Error: {result['error']}", file=sys.stderr)
                 return 1
+                
+        elif args.command == 'version':
+            if not args.version_command:
+                version_parser.print_help()
+                return 1
+                
+            if args.version_command == 'check':
+                update_info = check_for_updates()
+                if update_info:
+                    print(f"\nUpdate available!")
+                    print(f"Current version: {update_info['current_version']}")
+                    print(f"Latest version:  {update_info['latest_version']}")
+                    print(f"\nDownload: {update_info['download_url']}")
+                    print("\nRelease Notes:")
+                    print(update_info['release_notes'])
+                else:
+                    print(f"\nYou're up to date! (Version {__version__})")
+                    
+            elif args.version_command == 'bump':
+                new_version = bump_version(args.bump_type)
+                print("\nEnter changes (one per line, empty line to finish):")
+                changes = []
+                while True:
+                    try:
+                        line = input().strip()
+                        if not line:
+                            break
+                        changes.append(line)
+                    except EOFError:
+                        break
+                
+                from tools.version_manager import update_version_file
+                update_version_file(new_version, changes)
+                print(f"\nVersion {new_version} has been recorded")
+                
+            elif args.version_command == 'notes':
+                try:
+                    notes = generate_release_notes(args.version)
+                    print(notes)
+                except ValueError as e:
+                    print(f"Error: {e}", file=sys.stderr)
+                    return 1
     
     except Exception as e:
         print(f"Error: {str(e)}", file=sys.stderr)

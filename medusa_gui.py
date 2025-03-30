@@ -10,6 +10,7 @@ from PySide6.QtCore import Qt, QSize, QUrl
 from PySide6.QtGui import QPixmap, QDesktopServices
 from medusa_core import decompile_wavetable, recompile_wavetable, process_wavs, create_wavetable_bank
 from version import __version__ as VERSION, __app_name__ as APP_NAME
+from tools.version_manager import check_for_updates
 
 class MedusaApp(QMainWindow):
     def __init__(self):
@@ -152,6 +153,8 @@ class MedusaApp(QMainWindow):
         # Help menu
         help_menu = QMenu("&Help", self)
         menubar.addMenu(help_menu)
+        help_menu.addAction("Check for &Updates", self.check_updates)
+        help_menu.addSeparator()
         help_menu.addAction("&About", self.about)
         
         # Create central widget and layout
@@ -354,6 +357,36 @@ class MedusaApp(QMainWindow):
             )
         self.update_status("Ready")
     
+    def check_updates(self):
+        """Check for available updates and notify user."""
+        self.update_status("Checking for updates...")
+        update_info = check_for_updates()
+        
+        if update_info:
+            msg = QMessageBox(self)
+            msg.setWindowTitle("Update Available")
+            msg.setTextFormat(Qt.TextFormat.RichText)
+            msg.setText(
+                f"<h3>Update Available!</h3>"
+                f"<p>Current version: {update_info['current_version']}<br>"
+                f"Latest version: {update_info['latest_version']}</p>"
+                f"<p>Release Notes:</p>"
+                f"<pre>{update_info['release_notes']}</pre>"
+                f"<p>Would you like to download the update?</p>"
+            )
+            msg.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            msg.setDefaultButton(QMessageBox.StandardButton.Yes)
+            
+            if msg.exec() == QMessageBox.StandardButton.Yes:
+                QDesktopServices.openUrl(QUrl(update_info['download_url']))
+        else:
+            QMessageBox.information(
+                self,
+                "No Updates Available",
+                f"You're running the latest version ({VERSION})!"
+            )
+        self.update_status("Ready")
+    
     def about(self):
         about_box = QMessageBox(self)
         about_box.setWindowTitle(f"About {APP_NAME}")
@@ -377,6 +410,12 @@ def main():
     app = QApplication.instance()
     if app is None:
         app = QApplication(sys.argv)
+    
+    # Set application name and organization for macOS menu bar
+    app.setApplicationName(APP_NAME)
+    app.setOrganizationName("Justin Maxwell")
+    app.setOrganizationDomain("code404.com")
+    app.setApplicationDisplayName(APP_NAME)
     
     window = MedusaApp()
     window.show()
