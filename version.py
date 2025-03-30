@@ -6,12 +6,19 @@
 # Minor version for new functionality in a backwards compatible manner
 # Patch version for backwards compatible bug fixes
 
-__version__ = "1.1.0"
+__version__ = "1.4.0"
 __author__ = "jkmaxwell"
 __app_name__ = "Medusa Wavetable Utility"
 
 # Update history
 VERSION_HISTORY = {
+    "1.4.0": {
+        "date": "2025-03-29",
+        "changes": [
+            "Finally got FFMPEG and the temp directory working! Oh my god!",
+            "Added version manager",
+        ]
+    },
     "1.1.0": {
         "date": "2025-03-28",
         "changes": [
