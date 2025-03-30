@@ -207,22 +207,22 @@ def recompile_wavetable(input_dir, output_file):
 import subprocess
 import random
 import glob
+import tempfile
 
-def create_wavetable_bank(input_dir, output_file, random_order=False, temp_dir='temp_waves'):
+def create_wavetable_bank(input_dir, output_file, random_order=False):
     """Create a wavetable bank from a directory of audio files.
     
     Args:
         input_dir: Directory containing audio files
         output_file: Path for the output .polyend file
         random_order: If True, select files randomly. If False, use alphabetical order
-        temp_dir: Directory for temporary WAV files
         
     Returns:
         dict: Result of the operation with success status and details
     """
     try:
-        # Create temp directory
-        os.makedirs(temp_dir, exist_ok=True)
+        # Create temp directory using tempfile
+        temp_dir = tempfile.mkdtemp(prefix='medusa_')
         
         # Find all audio files (wav, aif, aiff, etc.)
         audio_files = []
