@@ -208,6 +208,7 @@ import subprocess
 import random
 import glob
 import tempfile
+import sys
 
 def create_wavetable_bank(input_dir, output_file, random_order=False):
     """Create a wavetable bank from a directory of audio files.
@@ -244,8 +245,19 @@ def create_wavetable_bank(input_dir, output_file, random_order=False):
         for i, audio_file in enumerate(audio_files):
             output_wav = os.path.join(temp_dir, f'temp_{i:02d}.wav')
             try:
+                # Get the application path for bundled app
+                if getattr(sys, 'frozen', False):
+                    app_path = os.path.dirname(os.path.dirname(sys.executable))  # Go up to Contents
+                    ffmpeg_path = os.path.join(app_path, 'Resources', 'ffmpeg')
+                    if not os.path.exists(ffmpeg_path):
+                        raise Exception(f"ffmpeg not found at {ffmpeg_path}")
+                    # Make ffmpeg executable
+                    os.chmod(ffmpeg_path, 0o755)
+                else:
+                    ffmpeg_path = 'ffmpeg'
+
                 subprocess.run([
-                    'ffmpeg', '-y',
+                    ffmpeg_path, '-y',
                     '-i', audio_file,
                     '-ar', '44100',
                     '-ac', '1',

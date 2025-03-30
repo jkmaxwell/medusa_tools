@@ -10,7 +10,8 @@ common_analysis = {
         ('medusa_core.py', '.'),
         ('version.py', '.'),
         ('styles', 'styles'),
-        ('tools/version_manager.py', 'tools')
+        ('tools/version_manager.py', 'tools'),
+        ('/opt/homebrew/bin/ffmpeg', '.')
     ],
     'hiddenimports': ['resources_rc', 'packaging', 'packaging.version'],
     'excludes': ['tkinter', 'PyQt5', 'PyQt6'],
@@ -119,8 +120,8 @@ app = BUNDLE(
     info_plist={
         'CFBundleDisplayName': 'Medusa Wavetable Utility',
         'CFBundleName': 'Medusa Wavetable Utility',
-        'CFBundleShortVersionString': '1.0.0',
-        'CFBundleVersion': '1.0.0',
+        'CFBundleShortVersionString': '1.4.0',
+        'CFBundleVersion': '1.4.0',
         'NSHighResolutionCapable': 'True'
     }
 )
