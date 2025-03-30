@@ -37,6 +37,9 @@ The tool will automatically detect FFmpeg in common installation locations:
 - MacPorts: /opt/local/bin/ffmpeg
 - System: /usr/bin/ffmpeg
 
+Please watch this:
+https://www.loom.com/share/3f718f692a5c465cb3c0d09050ec9560
+
 ## Quick Start
 
 The most common use case is creating a new wavetable bank from audio files:
