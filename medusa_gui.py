@@ -22,7 +22,6 @@ class MedusaApp(QMainWindow):
                 border-image: url(:/images/background.png) 0 0 0 0 stretch stretch;
             }
             QWidget {
-                background: transparent;
                 color: #000000;
                 font-family: "MS Sans Serif", Arial;
                 font-size: 12px;
@@ -50,7 +49,7 @@ class MedusaApp(QMainWindow):
                 background-color: rgba(128, 128, 128, 0.7);
             }
             QGroupBox {
-                background-color: rgba(192, 192, 192, 0.85);
+                background-color: rgba(0, 0, 0, 0.5);
                 text-transform: uppercase;
                 border: 2px solid #808080;
                 border-style: solid;
@@ -157,6 +156,7 @@ class MedusaApp(QMainWindow):
         
         # Create central widget and layout
         central_widget = QWidget()
+        central_widget.setStyleSheet("background: transparent;")
         self.setCentralWidget(central_widget)
         # Add header image
         header_label = QLabel()
@@ -174,6 +174,7 @@ class MedusaApp(QMainWindow):
         
         # Create wavetable group
         create_group = QGroupBox("CREATE WAVETABLE")
+        create_group.setStyleSheet("QGroupBox { background-color: rgba(0, 0, 0, 0.5); }")
         create_layout = QVBoxLayout(create_group)
         
         create_btn = QPushButton("Create from Audio Files")
@@ -204,6 +205,7 @@ class MedusaApp(QMainWindow):
         
         # Tools group
         tools_group = QGroupBox("TOOLS")
+        tools_group.setStyleSheet("QGroupBox { background-color: rgba(0, 0, 0, 0.5); }")
         tools_layout = QVBoxLayout(tools_group)
         
         decompile_btn = QPushButton("Decompile .polyend File")
