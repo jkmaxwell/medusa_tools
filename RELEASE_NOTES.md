@@ -1,4 +1,4 @@
-# Medusa Wavetable Utility v1.6.0
+# Medusa Wavetable Utility v1.5.0
 
 Released: 2025-03-29
 
