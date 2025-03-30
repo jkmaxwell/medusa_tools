@@ -1,17 +1,16 @@
-# Medusa Wavetable Utility v1.5.0
+# Medusa Wavetable Utility v1.6.0
 
 Released: 2025-03-29
 
-## Changes
+## Important Changes
 
-- Improved FFMPEG dependency checking and test suite
-- Fixed FFMPEG integration in macOS app bundle:
-  - Properly bundle FFMPEG in Resources directory
-  - Added macOS packaging documentation
-  - Fixed FFMPEG path handling in core module
-- Enhanced GUI with new features:
-  - Added full-screen background image with proper scaling
-  - Improved visual contrast with semi-transparent UI elements
-  - Updated section headers to uppercase for better readability
-  - Refined Windows 95-style aesthetics while maintaining functionality
+- Simplified to CLI-only version
+- Single executable distribution: download the compiled `medusa_cli` tool
+- GUI version temporarily removed
+- All functionality available through CLI commands
 
+## Installation
+
+1. Download the compiled `medusa_cli` executable from the releases page
+2. Ensure FFmpeg is installed on your system
+3. Run the tool from your terminal

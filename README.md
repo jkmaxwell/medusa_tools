@@ -2,27 +2,20 @@
 
 A collection of tools for working with Polyend Medusa synthesizer files.
 
-## Wavetable Tool
+## Important Notice
 
-The `medusa_wavetable_tool.py` script allows you to extract, modify, and recompile wavetables from Polyend Medusa wavetable files (`.polyend` extension).
+**The GUI version is temporarily unavailable. Please use the CLI version described below for all operations.**
 
-### Features
+## Installation
 
-- Extract all wavetables to individual WAV files
-- Recompile modified WAV files back into Medusa format
-- List detailed information about wavetables
-- Verify file integrity after modifications
-- Preserves all metadata and file structure
+1. Download the compiled `medusa_cli` executable from the releases page
+2. Install FFmpeg (required for audio file conversion)
+3. Make the CLI tool executable:
+   ```bash
+   chmod +x medusa_cli
+   ```
 
-### Requirements
-
-- Python 3.6 or higher
-- FFmpeg (required for audio file conversion)
-- Standard Python libraries (no additional dependencies needed)
-
-### Installation
-
-#### FFmpeg Installation (Required)
+### FFmpeg Installation
 
 FFmpeg is required for audio file conversion. To install FFmpeg on macOS:
 
@@ -39,194 +32,101 @@ Alternative methods:
 - Download from [FFmpeg website](https://ffmpeg.org/download.html)
 - Using MacPorts: `sudo port install ffmpeg`
 
-The application will automatically detect FFmpeg in common installation locations:
+The tool will automatically detect FFmpeg in common installation locations:
 - Homebrew: /usr/local/bin/ffmpeg
 - MacPorts: /opt/local/bin/ffmpeg
 - System: /usr/bin/ffmpeg
 
-If FFmpeg is installed but not found, ensure it's properly linked in your PATH or contact support with the installation location.
+## Quick Start
 
-#### Command Line Version
-1. Clone or download this repository
-2. Make the scripts executable:
-   ```bash
-   chmod +x medusa_wavetable_tool.py medusa_wav_preprocessor.py
-   ```
-
-#### Mac Version
-
-1. Clone or download this repository
-2. Create and activate virtual environment:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-3. Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-4. Make the script executable:
-   ```bash
-   chmod +x medusa_mac.py
-   ```
-
-The tool is available as a command-line application:
+The most common use case is creating a new wavetable bank from audio files:
 
 ```bash
-# Extract wavetables from a .polyend file (defaults to medusa64Wavetables.polyend)
-./medusa_mac.py decompile [input.polyend]
+# Create a wavetable bank with alphanumeric ordering (recommended for most users)
+./medusa_cli create input_directory output.polyend
 
-# Create a .polyend file from WAV files
-./medusa_mac.py recompile waves_dir output.polyend
-
-# Process custom WAV files for use with Medusa
-./medusa_mac.py process input_dir output_dir
+# Create a wavetable bank with random ordering
+./medusa_cli create input_directory output.polyend --random
 ```
 
-The tool will:
-- Automatically create a 'waves' directory for decompiled files
-- Preserve all metadata and file structure
-- Process WAV files to the correct format (mono, 44.1kHz, 16-bit)
+Other available commands:
+```bash
+# Extract wavetables from an existing .polyend file
+./medusa_cli decompile input.polyend
 
-#### Build from Source
-1. Create a virtual environment:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-2. Install dependencies:
-   ```bash
-   pip install PySide6 numpy
-   ```
-3. Build the app:
-   ```bash
-   pyinstaller medusa.spec
-   ```
-4. Move to Applications:
-   ```bash
-   mv "dist/Medusa.app" /Applications/
-   ```
+# Recompile processed WAV files into a .polyend file
+./medusa_cli recompile processed_waves/ output.polyend
 
-### Usage
+# Show version information
+./medusa_cli --version
+```
 
-#### Decompiling Wavetables
+## Detailed Usage Guide
+
+### Creating Wavetable Banks
+
+The `create` command is the primary way to generate wavetable banks from your audio files. You have two ordering options:
+
+1. Alphanumeric ordering (default):
+   ```bash
+   ./medusa_cli create input_directory output.polyend
+   ```
+   - Files are processed in alphanumeric order
+   - Predictable and organized results
+   - Recommended for most users
+   - Great for organized sound design
+
+2. Random ordering:
+   ```bash
+   ./medusa_cli create input_directory output.polyend --random
+   ```
+   - Files are randomly ordered in the wavetable bank
+   - Creates unique combinations
+   - Good for experimental sound design
+   - Different result each time
+
+The tool will automatically:
+- Convert files to the required format (44.1kHz, 16-bit mono)
+- Extract single-cycle waveforms at zero crossings
+- Normalize audio levels
+- Limit to maximum 64 wavetables
+- Create necessary metadata
+
+### Decompiling Wavetables
 
 Extract all wavetables from a `.polyend` file to individual WAV files:
 
 ```bash
-./medusa_wavetable_tool.py decompile medusa64Wavetables.polyend --output waves
+./medusa_cli decompile input.polyend
 ```
 
-This creates a directory named `waves` containing:
+This creates a directory containing:
 - 64 WAV files (wavetable_00.wav through wavetable_63.wav)
 - Each WAV file contains a single cycle waveform
 
-#### Editing Wavetables
+### Editing Wavetables
 
 The extracted WAV files are standard 44.1kHz 16-bit mono files that can be edited in any audio editor. Each wavetable is a single cycle waveform.
 
-#### Processing Custom Wavetables
-
-The `medusa_wav_preprocessor.py` script helps prepare custom WAV files for use with Medusa:
-
-1. Converts files to the required format (44.1kHz, 16-bit mono)
-2. Extracts single-cycle waveforms at zero crossings
-3. Normalizes audio levels
-4. Limits to maximum 64 wavetables
-5. Creates necessary metadata files
-
-```bash
-# Process a folder of WAV files
-./medusa_wav_preprocessor.py input_waves/ processed_waves/
-
-# Then recompile into Medusa format
-./medusa_wavetable_tool.py recompile processed_waves/ --output custom_wavetables.polyend
-```
-
-Requirements:
-- Python 3.6 or higher
-- scipy
-- soundfile
-- numpy
-
-Install dependencies:
-```bash
-pip install scipy soundfile numpy
-```
-
-#### Recompiling Wavetables
+### Recompiling Wavetables
 
 After editing the WAV files, recompile them back into a Medusa wavetable file:
 
 ```bash
-./medusa_wavetable_tool.py recompile waves --output recompiled.polyend
+./medusa_cli recompile waves --output recompiled.polyend
 ```
 
 To verify the recompiled file matches the original structure:
 
 ```bash
-./medusa_wavetable_tool.py recompile waves --output recompiled.polyend --verify-with original.polyend
+./medusa_cli recompile waves --output recompiled.polyend --verify-with original.polyend
 ```
 
-#### Listing Wavetable Information
+## Technical Details
 
-View detailed information about the wavetables in a file:
+The Polyend Medusa wavetable file format consists of 64 wavetables, each containing a single-cycle waveform. The tool handles all the technical details of file formatting and metadata automatically.
 
-```bash
-./medusa_wavetable_tool.py list medusa64Wavetables.polyend
-```
-
-### Technical Details
-
-#### File Format
-
-The Polyend Medusa wavetable file format consists of:
-- 64 wavetables, each 16,000 bytes (0x3E80)
-- Total file size: 1,024,128 bytes
-- Each wavetable contains:
-  - Header (4 bytes)
-  - Identifier (4 bytes)
-  - Subheader at offset 0x40 (8 bytes)
-  - Waveform data at offset 0x80
-
-#### Wavetable Structure
-
-Each wavetable section has this structure:
-```
-Offset  Size    Description
-0x0000  4       Header marker (first wavetable: 21 00 01 00, others: 02 00 00 3c)
-0x0004  4       Identifier bytes (unique per wavetable)
-0x0040  4       Subheader marker (04 00 00 3c)
-0x0044  2       Size value (04 00)
-0x0046  2       Index value (00-3F)
-0x0080  15872   Waveform data (raw 16-bit samples)
-```
-
-### Testing
-
-The project includes a comprehensive test suite that verifies:
-- Wavetable decompilation
-- Wavetable recompilation with verification
-- WAV file processing
-- Error handling
-
-Run the tests:
-```bash
-python3 test_medusa_tools.py -v
-```
-
-All tests must pass before any changes are merged.
-
-### Contributing
-
-Before submitting pull requests:
-1. Run the test suite to ensure no regressions
-2. Add tests for any new functionality
-3. Ensure all tests pass
-
-Feel free to submit issues, fork the repository, and create pull requests for any improvements.
-
-### License
+## License
 
 This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). This means:
 
