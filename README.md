@@ -4,7 +4,8 @@ A collection of tools for working with Polyend Medusa synthesizer files.
 
 ## Important Notice
 
-**The GUI version is temporarily unavailable. Please use the CLI version described below for all operations.**
+1. **The GUI version is temporarily unavailable. Please use the CLI version described below for all operations.**
+2. I haven't been a professional engineer since 2005 when I worked on Apple's AJAX libraries. 90% of this code here was written with the help of AI (ChatGPT, Claude Code, RooCode). I honestly could not write this myself nor fix things without AI. So, please use and evaluate it with that knowledge. AI was my engineering partner, and I was effectively PM on it.
 
 ## Installation
 
