@@ -27,6 +27,14 @@ jobs:
           pyinstaller --name medusa_cli --onefile medusa_cli.py
           cd dist
           zip -r medusa_cli_${{ github.ref_name }}_macos.zip medusa_cli
+          cd ..
+          
+      - name: Build GUI app
+        run: |
+          pyinstaller --clean medusa.spec
+          cd dist
+          zip -r "Medusa Wavetable Utility_${{ github.ref_name }}_macos.zip" "Medusa Wavetable Utility.app"
+          cd ..
           
       - name: Generate release notes
         run: |
@@ -37,6 +45,7 @@ jobs:
         with:
           files: |
             dist/medusa_cli_${{ github.ref_name }}_macos.zip
+            dist/Medusa Wavetable Utility_${{ github.ref_name }}_macos.zip
           body_path: RELEASE_NOTES.md
           draft: false
           prerelease: false
