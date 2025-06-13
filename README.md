@@ -6,6 +6,20 @@ A collection of tools for working with Polyend Medusa synthesizer files.
 
 **The GUI version is temporarily unavailable. Please use the CLI version described below for all operations.**
 
+## Project Structure
+
+```
+medusa_tools/
+├── wavetables/           # Wavetable source files and compiled .polyend files
+│   ├── source/          # Source wavetable files
+│   │   ├── vox/        # Vocal wavetable sources
+│   │   └── sq80/       # SQ80 wavetable sources
+│   └── dist/           # Compiled .polyend files
+├── medusa_cli.py        # Command-line interface
+├── medusa_core.py       # Core functionality
+└── ...                 # Other project files
+```
+
 ## Installation
 
 1. Download the compiled `medusa_cli` executable from the releases page
