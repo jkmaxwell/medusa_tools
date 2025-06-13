@@ -11,6 +11,7 @@ from pathlib import Path
 from packaging import version
 import traceback
 import ast
+import importlib.util
 
 def get_version_file():
     """Get the path to version.py."""
@@ -115,36 +116,24 @@ def check_for_updates():
         }
     return None
 
+def get_version_history():
+    version_file = get_version_file()
+    spec = importlib.util.spec_from_file_location("version", version_file)
+    version_module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(version_module)
+    return version_module.VERSION_HISTORY
+
 def generate_release_notes(version):
     """Generate release notes for the specified version."""
-    version_file = get_version_file()
-    with open(version_file) as f:
-        content = f.read()
-    
-    # Extract version history
-    history_match = re.search(r'VERSION_HISTORY\s*=\s*{([^}]*)}', content, re.DOTALL)
-    if not history_match:
-        raise ValueError("Version history not found")
-    
-    history_str = history_match.group(1).strip()
-    
-    # Safely parse the dictionary
-    try:
-        history = ast.literal_eval(f"{{{history_str}}}")
-    except SyntaxError as e:
-        raise ValueError(f"Failed to parse version history: {e}")
-    
+    history = get_version_history()
     if version not in history:
         raise ValueError(f"Version {version} not found in history")
-    
     release_info = history[version]
-    
     notes = f"# Medusa Wavetable Utility v{version}\n\n"
     notes += f"Released: {release_info['date']}\n\n"
     notes += "## Changes\n\n"
     for change in release_info['changes']:
         notes += f"- {change}\n"
-    
     return notes
 
 def main():
