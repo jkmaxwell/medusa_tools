@@ -144,6 +144,54 @@ To verify the recompiled file matches the original structure:
 
 The Polyend Medusa wavetable file format consists of 64 wavetables, each containing a single-cycle waveform. The tool handles all the technical details of file formatting and metadata automatically.
 
+## Testing
+
+The project includes a comprehensive test suite using pytest. The test structure is organized as follows:
+
+```
+tests/
+├── __init__.py
+├── conftest.py           # pytest configuration and fixtures
+├── test_cli.py          # CLI command tests
+├── test_core.py         # Core functionality tests
+└── data/                # Test data directory
+    ├── valid/          # Valid test files
+    └── invalid/        # Invalid test files
+```
+
+### Running Tests
+
+1. Install test dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. Run the test suite:
+   ```bash
+   pytest tests/
+   ```
+
+   For more detailed output:
+   ```bash
+   pytest -v tests/
+   ```
+
+### Test Coverage
+
+The test suite covers:
+- Basic CLI functionality (--version, --help)
+- Decompiling valid and invalid .polyend files
+- Recompiling WAV files
+- Creating wavetable banks (both normal and random ordering)
+- Core functionality testing
+
+Tests follow best practices:
+- Using pytest fixtures for test data and temporary directories
+- Proper cleanup after tests
+- Testing both success and failure cases
+- Testing file existence and content
+- Using temporary directories for test outputs
+
 ## License
 
 This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). This means:
