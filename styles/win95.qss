@@ -7,7 +7,7 @@ QMainWindow {
 QWidget {
     background-color: #c0c0c0;
     color: #000000;
-    font-family: "MS Sans Serif", Arial;
+    font-family: Helvetica, Arial, sans-serif;
     font-size: 12px;
 }
 
@@ -23,6 +23,7 @@ QPushButton {
     padding: 4px 8px;
     min-width: 75px;
     color: black;
+    font-family: Helvetica, Arial, sans-serif;
 }
 
 QPushButton:pressed {

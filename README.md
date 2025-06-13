@@ -4,7 +4,7 @@ A collection of tools for working with Polyend Medusa synthesizer files.
 
 ## Important Notice
 
-**The GUI version is temporarily unavailable. Please use the CLI version described below for all operations.**
+**The GUI version is now available! You can use either the GUI or CLI version.**
 
 ## Project Structure
 
@@ -16,11 +16,23 @@ medusa_tools/
 │   │   └── sq80/       # SQ80 wavetable sources
 │   └── dist/           # Compiled .polyend files
 ├── medusa_cli.py        # Command-line interface
+├── medusa_gui.py        # Graphical user interface
 ├── medusa_core.py       # Core functionality
 └── ...                 # Other project files
 ```
 
 ## Installation
+
+### GUI Version (Recommended for most users)
+
+1. Download the latest release from the releases page
+2. Extract the zip file
+3. Double-click `Medusa Wavetable Utility.app` to run
+4. If you get a security warning:
+   - Right-click (or Control-click) the app and select "Open"
+   - Or go to System Preferences > Security & Privacy and click "Open Anyway"
+
+### CLI Version
 
 1. Download the compiled `medusa_cli` executable from the releases page
 2. Install FFmpeg (required for audio file conversion)
@@ -32,8 +44,6 @@ medusa_tools/
 ### FFmpeg Installation
 
 FFmpeg is required for audio file conversion. To install FFmpeg on macOS:
-
-Using Homebrew (recommended):
 ```bash
 # Install Homebrew if not already installed
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -78,6 +88,31 @@ Other available commands:
 # Show version information
 ./medusa_cli --version
 ```
+
+## Using the GUI Version
+
+The GUI version provides a user-friendly interface for all wavetable operations:
+
+1. **Creating Wavetables**
+   - Click "Create Wavetable" button
+   - Select input directory containing audio files
+   - Choose output location and filename
+   - Select ordering (alphanumeric or random)
+   - Click "Create" to generate the wavetable bank
+
+2. **Decompiling Wavetables**
+   - Click "Decompile Wavetable" button
+   - Select input .polyend file
+   - Choose output directory
+   - Click "Decompile" to extract individual WAV files
+
+3. **Recompiling Wavetables**
+   - Click "Recompile Wavetable" button
+   - Select input directory containing WAV files
+   - Choose output location and filename
+   - Click "Recompile" to create the wavetable bank
+
+The GUI provides real-time feedback and progress updates for all operations.
 
 ## Detailed Usage Guide
 

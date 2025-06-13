@@ -24,7 +24,7 @@ class MedusaApp(QMainWindow):
             }
             QWidget {
                 color: #000000;
-                font-family: "MS Sans Serif", Arial;
+                font-family: Helvetica, Arial, sans-serif;
                 font-size: 12px;
             }
             QPushButton {
@@ -38,7 +38,7 @@ class MedusaApp(QMainWindow):
                 border-bottom-color: #303030;
                 padding: 3px 6px;
                 min-width: 85px;
-                font-family: "MS Sans Serif", Arial;
+                font-family: Helvetica, Arial, sans-serif;
                 font-size: 12px;
                 color: black;
             }
@@ -71,7 +71,7 @@ class MedusaApp(QMainWindow):
             }
             QRadioButton {
                 spacing: 6px;
-                font-family: "MS Sans Serif", Arial;
+                font-family: Helvetica, Arial, sans-serif;
                 font-size: 12px;
             }
             QRadioButton::indicator {
@@ -89,7 +89,7 @@ class MedusaApp(QMainWindow):
             QMenuBar {
                 background-color: #c0c0c0;
                 border-bottom: 1px solid #808080;
-                font-family: "MS Sans Serif", Arial;
+                font-family: Helvetica, Arial, sans-serif;
                 font-size: 12px;
             }
             QMenuBar::item {
@@ -110,7 +110,7 @@ class MedusaApp(QMainWindow):
                 border-left-color: #a0a0a0;
                 border-right-color: #303030;
                 border-bottom-color: #303030;
-                font-family: "MS Sans Serif", Arial;
+                font-family: Helvetica, Arial, sans-serif;
                 font-size: 12px;
             }
             QMenu::item {
@@ -129,7 +129,7 @@ class MedusaApp(QMainWindow):
                 border-left-color: #404040;
                 border-right-color: #ffffff;
                 border-bottom-color: #ffffff;
-                font-family: "MS Sans Serif", Arial;
+                font-family: Helvetica, Arial, sans-serif;
                 font-size: 12px;
                 padding: 2px 3px;
             }
