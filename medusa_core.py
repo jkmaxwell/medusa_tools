@@ -210,20 +210,48 @@ import glob
 import tempfile
 import sys
 
+def get_temp_dir():
+    """Get a sandbox-compatible temporary directory."""
+    if getattr(sys, 'frozen', False):
+        # When running as app bundle, use app container temp directory
+        app_path = os.path.dirname(os.path.dirname(sys.executable))
+        temp_base = os.path.join(app_path, 'Contents', 'Resources', 'temp')
+        os.makedirs(temp_base, exist_ok=True)
+        return tempfile.mkdtemp(dir=temp_base, prefix='medusa_')
+    else:
+        # In development, use system temp directory
+        return tempfile.mkdtemp(prefix='medusa_')
+
+def get_ffmpeg_path():
+    """Get the path to the FFmpeg executable, handling both development and bundled environments."""
+    if getattr(sys, 'frozen', False):
+        # When running as app bundle
+        app_path = os.path.dirname(os.path.dirname(sys.executable))
+        ffmpeg_path = os.path.join(app_path, 'Contents', 'Resources', 'ffmpeg')
+        if not os.path.exists(ffmpeg_path):
+            raise Exception(f"FFmpeg not found at {ffmpeg_path}")
+        # Ensure FFmpeg is executable
+        os.chmod(ffmpeg_path, 0o755)
+        return ffmpeg_path
+    else:
+        # In development, try to find FFmpeg in common locations
+        common_paths = [
+            '/usr/local/bin/ffmpeg',  # Homebrew
+            '/opt/homebrew/bin/ffmpeg',  # Apple Silicon Homebrew
+            '/opt/local/bin/ffmpeg',  # MacPorts
+            '/usr/bin/ffmpeg'  # System
+        ]
+        for path in common_paths:
+            if os.path.exists(path):
+                return path
+        raise Exception("FFmpeg not found. Please install FFmpeg using Homebrew or MacPorts.")
+
 def create_wavetable_bank(input_dir, output_file, random_order=False):
-    """Create a wavetable bank from a directory of audio files.
-    
-    Args:
-        input_dir: Directory containing audio files
-        output_file: Path for the output .polyend file
-        random_order: If True, select files randomly. If False, use alphabetical order
-        
-    Returns:
-        dict: Result of the operation with success status and details
-    """
+    """Create a wavetable bank from a directory of audio files."""
+    temp_dir = None
     try:
-        # Create temp directory using tempfile
-        temp_dir = tempfile.mkdtemp(prefix='medusa_')
+        # Create temp directory using sandbox-compatible method
+        temp_dir = get_temp_dir()
         
         # Find all audio files (wav, aif, aiff, etc.)
         audio_files = []
@@ -240,22 +268,14 @@ def create_wavetable_bank(input_dir, output_file, random_order=False):
             else:
                 audio_files = sorted(audio_files)[:NUM_WAVETABLES]
         
+        # Get FFmpeg path
+        ffmpeg_path = get_ffmpeg_path()
+        
         # Convert files to WAV format
         converted_files = []
         for i, audio_file in enumerate(audio_files):
             output_wav = os.path.join(temp_dir, f'temp_{i:02d}.wav')
             try:
-                # Get the application path for bundled app
-                if getattr(sys, 'frozen', False):
-                    app_path = os.path.dirname(os.path.dirname(sys.executable))  # Go up to Contents
-                    ffmpeg_path = os.path.join(app_path, 'Resources', 'ffmpeg')
-                    if not os.path.exists(ffmpeg_path):
-                        raise Exception(f"ffmpeg not found at {ffmpeg_path}")
-                    # Make ffmpeg executable
-                    os.chmod(ffmpeg_path, 0o755)
-                else:
-                    ffmpeg_path = 'ffmpeg'
-
                 subprocess.run([
                     ffmpeg_path, '-y',
                     '-i', audio_file,
@@ -298,7 +318,8 @@ def create_wavetable_bank(input_dir, output_file, random_order=False):
         
     except Exception as e:
         # Clean up temp files on error
-        shutil.rmtree(temp_dir, ignore_errors=True)
+        if temp_dir and os.path.exists(temp_dir):
+            shutil.rmtree(temp_dir, ignore_errors=True)
         return {
             'success': False,
             'error': str(e)

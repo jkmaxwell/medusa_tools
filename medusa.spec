@@ -11,7 +11,7 @@ common_analysis = {
         ('version.py', '.'),
         ('styles', 'styles'),
         ('tools/version_manager.py', 'tools'),
-        ('/opt/homebrew/bin/ffmpeg', '.')
+        ('/opt/homebrew/bin/ffmpeg', 'Resources'),
     ],
     'hiddenimports': ['resources_rc', 'packaging', 'packaging.version'],
     'excludes': ['tkinter', 'PyQt5', 'PyQt6'],
@@ -97,7 +97,7 @@ gui_exe = EXE(
     argv_emulation=True,
     target_arch=None,
     codesign_identity=None,
-    entitlements_file=None,
+    entitlements_file='entitlements.plist',
 )
 
 gui_coll = COLLECT(
@@ -122,6 +122,8 @@ app = BUNDLE(
         'CFBundleName': 'Medusa Wavetable Utility',
         'CFBundleShortVersionString': '1.4.0',
         'CFBundleVersion': '1.4.0',
-        'NSHighResolutionCapable': 'True'
+        'NSHighResolutionCapable': 'True',
+        'LSBackgroundOnly': 'False',
+        'NSHumanReadableCopyright': '© 2024',
     }
 )
