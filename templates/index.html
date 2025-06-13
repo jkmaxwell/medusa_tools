@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Welcome to Medusa Wavetable Tools</h2>
+<p style="margin-bottom: 2rem; color: #666; font-size: 1.1rem;">
+    Create, edit, and manage wavetables for your Polyend Medusa synthesizer. 
+    No downloads, no macOS quarantine issues, just pure web-based convenience.
+</p>
+
+<div style="display: grid; gap: 1.5rem; margin-bottom: 2rem;">
+    <div style="display: flex; align-items: flex-start; gap: 1rem;">
+        <div style="background: #667eea; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">1</div>
+        <div>
+            <h3 style="margin-bottom: 0.5rem; color: #667eea;">Create Wavetable Banks</h3>
+            <p style="color: #666;">Upload your audio files and create custom wavetable banks for your Medusa. Supports WAV, AIFF, MP3, and OGG formats. Choose between alphabetical or random ordering.</p>
+            <a href="{{ url_for('create_wavetable') }}" style="color: #667eea; text-decoration: none; font-weight: 600;">Create Wavetables →</a>
+        </div>
+    </div>
+    
+    <div style="display: flex; align-items: flex-start; gap: 1rem;">
+        <div style="background: #764ba2; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">2</div>
+        <div>
+            <h3 style="margin-bottom: 0.5rem; color: #764ba2;">Decompile Wavetables</h3>
+            <p style="color: #666;">Extract individual wavetables from .polyend files as WAV files. Perfect for editing, analyzing, or backing up your wavetables.</p>
+            <a href="{{ url_for('decompile_wavetable_route') }}" style="color: #764ba2; text-decoration: none; font-weight: 600;">Decompile Wavetables →</a>
+        </div>
+    </div>
+    
+    <div style="display: flex; align-items: flex-start; gap: 1rem;">
+        <div style="background: #2dd4bf; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">3</div>
+        <div>
+            <h3 style="margin-bottom: 0.5rem; color: #2dd4bf;">Recompile Wavetables</h3>
+            <p style="color: #666;">After editing your extracted WAV files, recompile them back into a .polyend file ready for your Medusa synthesizer.</p>
+            <a href="{{ url_for('recompile_wavetable_route') }}" style="color: #2dd4bf; text-decoration: none; font-weight: 600;">Recompile Wavetables →</a>
+        </div>
+    </div>
+</div>
+
+<div style="background: #f1f5f9; border-radius: 8px; padding: 1.5rem; border-left: 4px solid #667eea;">
+    <h4 style="margin-bottom: 1rem; color: #667eea;">✨ Why Use the Web Version?</h4>
+    <ul style="list-style: none; padding: 0; color: #666;">
+        <li style="margin-bottom: 0.5rem;">🚫 No macOS quarantine restrictions</li>
+        <li style="margin-bottom: 0.5rem;">💾 No installation required</li>
+        <li style="margin-bottom: 0.5rem;">🌍 Works on any device with a browser</li>
+        <li style="margin-bottom: 0.5rem;">🔄 Always up-to-date</li>
+        <li style="margin-bottom: 0.5rem;">🔒 Files are processed securely and deleted after 1 hour</li>
+    </ul>
+</div>
+
+<div style="margin-top: 2rem; text-align: center; color: #666;">
+    <p>Need the command-line version? <a href="https://github.com/jkmaxwell/medusa_tools" style="color: #667eea;">Check out the CLI tools</a></p>
+</div>
+{% endblock %} 

@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                               QRadioButton, QMenuBar, QMenu, QGroupBox, QStatusBar)
 from PySide6.QtCore import Qt, QSize, QUrl
 from PySide6.QtGui import QPixmap, QDesktopServices
-from medusa_core import decompile_wavetable, recompile_wavetable, process_wavs, create_wavetable_bank
+from medusa_core import decompile_wavetable, recompile_wavetable, process_wavs, create_wavetable_bank, is_app_quarantined
 from version import __version__ as VERSION, __app_name__ as APP_NAME
 from tools.version_manager import check_for_updates
 
@@ -245,6 +245,20 @@ class MedusaApp(QMainWindow):
     
     def select_decompile_input(self):
         self.update_status("Selecting file to decompile...")
+        
+        # Check for quarantine and warn user
+        if is_app_quarantined():
+            msg = QMessageBox(self)
+            msg.setWindowTitle("App Quarantine Detected")
+            msg.setIcon(QMessageBox.Icon.Information)
+            msg.setText(
+                "This app is quarantined by macOS Gatekeeper, which may limit file access.\n\n"
+                "If you experience permission errors, you can fix this by running:\n"
+                "xattr -d com.apple.quarantine \"/path/to/Medusa Wavetable Utility.app\"\n\n"
+                "Or simply select a writable output directory when prompted."
+            )
+            msg.exec()
+        
         dialog = QFileDialog(self)
         dialog.setWindowTitle("Select Medusa Wavetable File")
         dialog.setNameFilter("Polyend Files (*.polyend)")
@@ -253,8 +267,21 @@ class MedusaApp(QMainWindow):
         
         if dialog.exec() == QFileDialog.DialogCode.Accepted:
             input_file = dialog.selectedFiles()[0]
+            
+            # Ask user where to save the extracted wavetables
+            output_dir = QFileDialog.getExistingDirectory(
+                self,
+                "Select Directory to Save Extracted Wavetables",
+                os.path.expanduser("~/Documents"),  # Default to Documents folder
+                QFileDialog.Option.ShowDirsOnly
+            )
+            
+            if not output_dir:
+                self.update_status("Ready")
+                return
+                
             self.update_status(f"Decompiling {os.path.basename(input_file)}...")
-            result = decompile_wavetable(input_file)
+            result = decompile_wavetable(input_file, output_dir)
             if result['success']:
                 QMessageBox.information(
                     self,

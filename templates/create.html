@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Create Wavetable - {{ app_name }}{% endblock %}
+
+{% block content %}
+<h2>Create Wavetable Bank</h2>
+<p style="margin-bottom: 2rem; color: #666;">
+    Upload your audio files to create a custom wavetable bank for your Polyend Medusa.
+    Supports WAV, AIFF, MP3, and OGG formats. Maximum 64 wavetables per bank.
+</p>
+
+<form method="POST" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="files">Select Audio Files</label>
+        <input type="file" id="files" name="files" multiple accept=".wav,.aif,.aiff,.mp3,.ogg" required>
+        <div class="file-info">
+            Choose up to 64 audio files. Files will be automatically converted to the correct format.
+            If you select more than 64 files, only the first 64 will be used (based on ordering below).
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label for="output_filename">Output Filename</label>
+        <input type="text" id="output_filename" name="output_filename" value="wavetables.polyend" placeholder="wavetables.polyend">
+        <div class="file-info">
+            The filename for your wavetable bank. '.polyend' extension will be added automatically if missing.
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <div class="checkbox-group">
+            <input type="checkbox" id="random_order" name="random_order">
+            <label for="random_order">Random file ordering</label>
+        </div>
+        <div class="file-info">
+            By default, files are processed in alphabetical order. 
+            Check this box to randomize the order for experimental results.
+        </div>
+    </div>
+    
+    <button type="submit" class="btn">Create Wavetable Bank</button>
+</form>
+
+<div style="margin-top: 2rem; background: #fffbeb; border: 1px solid #fed7aa; border-radius: 8px; padding: 1.5rem;">
+    <h4 style="color: #92400e; margin-bottom: 1rem;">💡 Tips for Best Results</h4>
+    <ul style="color: #92400e; padding-left: 1.5rem;">
+        <li style="margin-bottom: 0.5rem;">Use high-quality source audio (44.1kHz or higher)</li>
+        <li style="margin-bottom: 0.5rem;">Single-cycle waveforms work best</li>
+        <li style="margin-bottom: 0.5rem;">Avoid audio with DC offset or excessive silence</li>
+        <li style="margin-bottom: 0.5rem;">Name your files thoughtfully - they'll be processed alphabetically</li>
+        <li>The tool automatically normalizes levels and finds zero-crossings</li>
+    </ul>
+</div>
+{% endblock %} 

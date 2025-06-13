@@ -2,9 +2,13 @@
 
 A collection of tools for working with Polyend Medusa synthesizer files. MacOS only.
 
-## Important Notice
+## 🌐 NEW: Web Version Available!
 
-I'm still working on the GUI version. Please use the CLI version.
+**No downloads, no quarantine issues, no installation required!**
+
+Try the web version at: `http://localhost:5001` (run `./run_web.sh`)
+
+Perfect for users who want to avoid macOS quarantine restrictions.
 
 ## Project Structure
 
@@ -36,14 +40,40 @@ medusa_tools/
 
 ## Installation
 
-### ~~GUI Version (Recommended for most users)~~
+### 🌐 Web Version (Recommended)
 
-1. ~~Download the latest release from the releases page~~
-2. ~~Extract the zip file~~
-3. ~~Double-click `Medusa Wavetable Utility.app` to run~~
-4. ~~If you get a security warning:~~
-   - ~~Right-click (or Control-click) the app and select "Open"~~
-   - ~~Or go to System Preferences > Security & Privacy and click "Open Anyway"~~
+**Zero installation, works everywhere:**
+
+```bash
+# Clone or download this repo
+git clone https://github.com/jkmaxwell/medusa_tools.git
+cd medusa_tools
+
+# Install web dependencies
+pip install -r requirements_web.txt
+
+# Start the web server
+./run_web.sh
+```
+
+Open your browser to `http://localhost:5001` and enjoy!
+
+### GUI Version (macOS App)
+
+1. Download the latest release from the releases page
+2. Extract the zip file
+3. **Important:** Remove macOS quarantine to avoid permission issues:
+   ```bash
+   # Run this command after downloading:
+   xattr -d com.apple.quarantine "/path/to/Medusa Wavetable Utility.app"
+   
+   # Or use the included fix script:
+   ./fix_quarantine.sh
+   ```
+4. Double-click `Medusa Wavetable Utility.app` to run
+5. If you get a security warning:
+   - Right-click (or Control-click) the app and select "Open"
+   - Or go to System Preferences > Security & Privacy and click "Open Anyway"
 
 ### CLI Version
 
@@ -197,6 +227,54 @@ To verify the recompiled file matches the original structure:
 ```bash
 ./medusa_cli recompile waves --output recompiled.polyend --verify-with original.polyend
 ```
+
+## Troubleshooting
+
+### Permission Errors (macOS)
+
+If you get "Operation not permitted" errors when using the GUI version:
+
+**Cause:** macOS quarantine system restricts downloaded apps from accessing the file system.
+
+**Solutions:**
+
+1. **Remove quarantine (Recommended):**
+   ```bash
+   # Replace with your actual app path
+   xattr -d com.apple.quarantine "/path/to/Medusa Wavetable Utility.app"
+   
+   # Or use the included script
+   ./fix_quarantine.sh
+   ```
+
+2. **Use the built-in workaround:**
+   - The app will now prompt you to select both input file AND output directory
+   - Choose a directory you have write access to (like Desktop or Documents)
+
+3. **Check quarantine status:**
+   ```bash
+   # Check if app is quarantined
+   xattr -l "/path/to/Medusa Wavetable Utility.app"
+   
+   # Should show no com.apple.quarantine if fixed
+   ```
+
+### FFmpeg Not Found
+
+If you get "FFmpeg not found" errors:
+
+1. Install using Homebrew:
+   ```bash
+   brew install ffmpeg
+   ```
+
+2. Or download from [ffmpeg.org](https://ffmpeg.org/download.html)
+
+### File Format Issues
+
+- Ensure input audio files are in supported formats (WAV, AIFF, MP3, OGG)
+- For best results, use high-quality source audio (44.1kHz or higher)
+- The tool automatically converts to the required format
 
 ## Technical Details
 

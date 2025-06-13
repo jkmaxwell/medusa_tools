@@ -4,6 +4,7 @@ import os
 import wave
 import struct
 import shutil
+import subprocess
 from pathlib import Path
 
 # Constants
@@ -102,7 +103,20 @@ def decompile_wavetable(input_file, output_dir=None):
         # Use waves directory next to input file if no output dir specified
         if output_dir is None:
             output_dir = os.path.join(os.path.dirname(input_file), 'waves')
-        os.makedirs(output_dir, exist_ok=True)
+            
+        # Try to create the output directory, with fallback for permission issues
+        try:
+            os.makedirs(output_dir, exist_ok=True)
+        except (PermissionError, OSError):
+            # If we can't write to the requested location, use a safe fallback
+            if output_dir == os.path.join(os.path.dirname(input_file), 'waves'):
+                # Only use fallback if this was the default location
+                fallback_dir = os.path.join(os.path.expanduser("~/Documents"), 'medusa_waves')
+                os.makedirs(fallback_dir, exist_ok=True)
+                output_dir = fallback_dir
+            else:
+                # Re-raise the error if user specifically chose this location
+                raise
         
         # Read the polyend file
         with open(input_file, 'rb') as f:
@@ -376,3 +390,19 @@ def process_wavs(input_dir, output_dir):
             'success': False,
             'error': str(e)
         }
+
+def is_app_quarantined():
+    """Check if the current app is quarantined by macOS Gatekeeper."""
+    try:
+        import sys
+        if getattr(sys, 'frozen', False):
+            # Get the app bundle path
+            app_path = os.path.dirname(os.path.dirname(os.path.dirname(sys.executable)))
+            if app_path.endswith('.app'):
+                # Check for quarantine attribute
+                result = subprocess.run(['xattr', '-p', 'com.apple.quarantine', app_path], 
+                                      capture_output=True, text=True)
+                return result.returncode == 0
+    except:
+        pass
+    return False
