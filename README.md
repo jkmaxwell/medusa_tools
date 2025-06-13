@@ -1,11 +1,10 @@
 # Polyend Medusa Tools
 
-A collection of tools for working with Polyend Medusa synthesizer files.
+A collection of tools for working with Polyend Medusa synthesizer files. MacOS only.
 
 ## Important Notice
 
-<<<<<<< HEAD
-**The GUI version is now available! You can use either the GUI or CLI version.**
+I'm still working on the GUI version. Please use the CLI version.
 
 ## Project Structure
 
@@ -21,21 +20,30 @@ medusa_tools/
 ├── medusa_core.py       # Core functionality
 └── ...                 # Other project files
 ```
+
 =======
+
 1. **The GUI version is temporarily unavailable. Please use the CLI version described below for all operations.**
 2. I haven't been a professional engineer since 2005 when I worked on Apple's AJAX libraries. 90% of this code here was written with the help of AI (ChatGPT, Claude Code, RooCode). I honestly could not write this myself nor fix things without AI. So, please use and evaluate it with that knowledge. AI was my engineering partner, and I was effectively PM on it.
+
 >>>>>>> a37015f339995e54426432ec2504da58cd71a236
+>>>>>>>
+>>>>>>
+>>>>>
+>>>>
+>>>
+>>
 
 ## Installation
 
-### GUI Version (Recommended for most users)
+### ~~GUI Version (Recommended for most users)~~
 
-1. Download the latest release from the releases page
-2. Extract the zip file
-3. Double-click `Medusa Wavetable Utility.app` to run
-4. If you get a security warning:
-   - Right-click (or Control-click) the app and select "Open"
-   - Or go to System Preferences > Security & Privacy and click "Open Anyway"
+1. ~~Download the latest release from the releases page~~
+2. ~~Extract the zip file~~
+3. ~~Double-click `Medusa Wavetable Utility.app` to run~~
+4. ~~If you get a security warning:~~
+   - ~~Right-click (or Control-click) the app and select "Open"~~
+   - ~~Or go to System Preferences > Security & Privacy and click "Open Anyway"~~
 
 ### CLI Version
 
@@ -49,6 +57,7 @@ medusa_tools/
 ### FFmpeg Installation
 
 FFmpeg is required for audio file conversion. To install FFmpeg on macOS:
+
 ```bash
 # Install Homebrew if not already installed
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
@@ -58,10 +67,12 @@ brew install ffmpeg
 ```
 
 Alternative methods:
+
 - Download from [FFmpeg website](https://ffmpeg.org/download.html)
 - Using MacPorts: `sudo port install ffmpeg`
 
 The tool will automatically detect FFmpeg in common installation locations:
+
 - Homebrew: /usr/local/bin/ffmpeg
 - MacPorts: /opt/local/bin/ffmpeg
 - System: /usr/bin/ffmpeg
@@ -83,6 +94,7 @@ The most common use case is creating a new wavetable bank from audio files:
 ```
 
 Other available commands:
+
 ```bash
 # Extract wavetables from an existing .polyend file
 ./medusa_cli decompile input.polyend
@@ -99,19 +111,20 @@ Other available commands:
 The GUI version provides a user-friendly interface for all wavetable operations:
 
 1. **Creating Wavetables**
+
    - Click "Create Wavetable" button
    - Select input directory containing audio files
    - Choose output location and filename
    - Select ordering (alphanumeric or random)
    - Click "Create" to generate the wavetable bank
-
 2. **Decompiling Wavetables**
+
    - Click "Decompile Wavetable" button
    - Select input .polyend file
    - Choose output directory
    - Click "Decompile" to extract individual WAV files
-
 3. **Recompiling Wavetables**
+
    - Click "Recompile Wavetable" button
    - Select input directory containing WAV files
    - Choose output location and filename
@@ -126,24 +139,28 @@ The GUI provides real-time feedback and progress updates for all operations.
 The `create` command is the primary way to generate wavetable banks from your audio files. You have two ordering options:
 
 1. Alphanumeric ordering (default):
+
    ```bash
    ./medusa_cli create input_directory output.polyend
    ```
+
    - Files are processed in alphanumeric order
    - Predictable and organized results
    - Recommended for most users
    - Great for organized sound design
-
 2. Random ordering:
+
    ```bash
    ./medusa_cli create input_directory output.polyend --random
    ```
+
    - Files are randomly ordered in the wavetable bank
    - Creates unique combinations
    - Good for experimental sound design
    - Different result each time
 
 The tool will automatically:
+
 - Convert files to the required format (44.1kHz, 16-bit mono)
 - Extract single-cycle waveforms at zero crossings
 - Normalize audio levels
@@ -159,6 +176,7 @@ Extract all wavetables from a `.polyend` file to individual WAV files:
 ```
 
 This creates a directory containing:
+
 - 64 WAV files (wavetable_00.wav through wavetable_63.wav)
 - Each WAV file contains a single cycle waveform
 
@@ -184,7 +202,7 @@ To verify the recompiled file matches the original structure:
 
 The Polyend Medusa wavetable file format consists of 64 wavetables, each containing a single-cycle waveform. The tool handles all the technical details of file formatting and metadata automatically.
 
-## Testing
+## Testing (For Developers — Users can ignore this)
 
 The project includes a comprehensive test suite using pytest. The test structure is organized as follows:
 
@@ -202,16 +220,18 @@ tests/
 ### Running Tests
 
 1. Install test dependencies:
+
    ```bash
    pip install -r requirements.txt
    ```
-
 2. Run the test suite:
+
    ```bash
    pytest tests/
    ```
 
    For more detailed output:
+
    ```bash
    pytest -v tests/
    ```
@@ -219,6 +239,7 @@ tests/
 ### Test Coverage
 
 The test suite covers:
+
 - Basic CLI functionality (--version, --help)
 - Decompiling valid and invalid .polyend files
 - Recompiling WAV files
@@ -226,6 +247,7 @@ The test suite covers:
 - Core functionality testing
 
 Tests follow best practices:
+
 - Using pytest fixtures for test data and temporary directories
 - Proper cleanup after tests
 - Testing both success and failure cases
