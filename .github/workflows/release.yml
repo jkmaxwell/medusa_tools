@@ -22,6 +22,17 @@ jobs:
           pip install -r requirements.txt
           pip install pyinstaller
           
+      - name: Install ffmpeg
+        run: |
+          brew install ffmpeg
+
+      - name: Verify ffmpeg installation
+        run: |
+          if [ ! -f "/opt/homebrew/bin/ffmpeg" ]; then
+            echo "ffmpeg not found at /opt/homebrew/bin/ffmpeg"
+            exit 1
+          fi
+
       - name: Build CLI tool
         run: |
           pyinstaller --name medusa_cli --onefile medusa_cli.py
@@ -51,19 +62,3 @@ jobs:
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  notify:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Send notification
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const release = context.ref.replace('refs/tags/', '')
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: 1,
-              body: `🎉 Version ${release} has been released! Check it out at https://github.com/${context.repo.owner}/${context.repo.repo}/releases/tag/${release}`
-            })
