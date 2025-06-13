@@ -119,12 +119,26 @@ def generate_release_notes(version):
     with open(version_file) as f:
         content = f.read()
     
-    # Extract version history
-    history_match = re.search(r'VERSION_HISTORY = {(.*?)}', content, re.DOTALL)
+    # Extract version history with a more robust pattern
+    history_match = re.search(r'VERSION_HISTORY\s*=\s*{([^}]*)}', content, re.DOTALL)
     if not history_match:
         raise ValueError("Version history not found")
     
-    history = eval(f"{{{history_match.group(1)}}}")
+    # Convert Python dict literal to JSON string
+    history_str = history_match.group(1).strip()
+    # Replace single quotes with double quotes for JSON
+    history_str = history_str.replace("'", '"')
+    # Add quotes around keys that don't have them
+    history_str = re.sub(r'(\w+):', r'"\1":', history_str)
+    # Remove trailing commas in lists
+    history_str = re.sub(r',\s*]', ']', history_str)
+    
+    try:
+        history = json.loads(f"{{{history_str}}}")
+    except json.JSONDecodeError as e:
+        print(f"Debug - history_str: {history_str}")  # Debug output
+        raise ValueError(f"Failed to parse version history: {e}")
+    
     if version not in history:
         raise ValueError(f"Version {version} not found in history")
     
