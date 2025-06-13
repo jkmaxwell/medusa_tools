@@ -9,6 +9,7 @@ import datetime
 import urllib.request
 from pathlib import Path
 from packaging import version
+import traceback
 
 def get_version_file():
     """Get the path to version.py."""
@@ -200,8 +201,9 @@ def main():
         try:
             notes = generate_release_notes(version)
             print(notes)
-        except ValueError as e:
-            print(f"Error: {e}")
+        except Exception as e:
+            print(f"Error: {e}", file=sys.stderr)
+            traceback.print_exc()
             sys.exit(1)
 
 if __name__ == "__main__":
