@@ -248,17 +248,26 @@ def get_ffmpeg_path():
         os.chmod(ffmpeg_path, 0o755)
         return ffmpeg_path
     else:
-        # In development, try to find FFmpeg in common locations
+        # First try to find FFmpeg using 'which' command (works on Linux/Railway)
+        try:
+            result = subprocess.run(['which', 'ffmpeg'], capture_output=True, text=True, check=True)
+            ffmpeg_path = result.stdout.strip()
+            if ffmpeg_path and os.path.exists(ffmpeg_path):
+                return ffmpeg_path
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            pass
+        
+        # Fallback to common installation paths
         common_paths = [
+            '/usr/bin/ffmpeg',  # System/Linux
             '/usr/local/bin/ffmpeg',  # Homebrew
             '/opt/homebrew/bin/ffmpeg',  # Apple Silicon Homebrew
             '/opt/local/bin/ffmpeg',  # MacPorts
-            '/usr/bin/ffmpeg'  # System
         ]
         for path in common_paths:
             if os.path.exists(path):
                 return path
-        raise Exception("FFmpeg not found. Please install FFmpeg using Homebrew or MacPorts.")
+        raise Exception("FFmpeg not found. Please install FFmpeg or ensure it's in your system PATH.")
 
 def create_wavetable_bank(input_dir, output_file, random_order=False):
     """Create a wavetable bank from a directory of audio files."""
