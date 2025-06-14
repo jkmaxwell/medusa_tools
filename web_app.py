@@ -54,7 +54,7 @@ def index():
 @app.route('/create', methods=['GET', 'POST'])
 def create_wavetable():
     if request.method == 'GET':
-        return render_template('create.html')
+        return redirect(url_for('index'))
     
     # Handle file upload
     if 'files' not in request.files:
@@ -113,7 +113,7 @@ def create_wavetable():
 @app.route('/decompile', methods=['GET', 'POST'])
 def decompile_wavetable_route():
     if request.method == 'GET':
-        return render_template('decompile.html')
+        return redirect(url_for('index'))
     
     # Handle file upload
     if 'file' not in request.files:
@@ -168,7 +168,7 @@ def decompile_wavetable_route():
 @app.route('/recompile', methods=['GET', 'POST'])
 def recompile_wavetable_route():
     if request.method == 'GET':
-        return render_template('recompile.html')
+        return redirect(url_for('index'))
     
     # Handle file upload
     if 'files' not in request.files:
