@@ -1,0 +1,11 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "gunicorn --bind 0.0.0.0:$PORT web_app:app --timeout 120 --workers 2"
+healthcheckPath = "/"
+healthcheckTimeout = 100
+restartPolicyType = "ON_FAILURE"
+
+[env]
+PYTHON_VERSION = "3.11" 

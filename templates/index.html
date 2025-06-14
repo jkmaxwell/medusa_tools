@@ -1,53 +1,102 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Welcome to Medusa Wavetable Tools</h2>
-<p style="margin-bottom: 2rem; color: #666; font-size: 1.1rem;">
-    Create, edit, and manage wavetables for your Polyend Medusa synthesizer. 
-    No downloads, no macOS quarantine issues, just pure web-based convenience.
-</p>
+<div class="card">
+    <div class="window-title">Welcome</div>
+    <h2 style="color: #000080; font-size: 14px; margin-bottom: 8px; text-transform: uppercase;">{{ app_name }} v{{ version }}</h2>
+    <p style="margin-bottom: 12px; color: #000000; font-size: 12px;">
+        Create, edit, and manage wavetables for your Polyend Medusa synthesizer. By <a href="https://code404.com">Justin Maxwell</a>. Not affiliated with Polyend, so don&rsquo;t bother them about it. Did you use this and find it useful? Cool. Venmo me at @octavecat to cover hosting costs. Thanks.
+    </p>
+    <p>Github Repo: <a href="https://github.com/jkmaxwell/medusa_tools">https://github.com/jkmaxwell/medusa_tools</a></p>
+    <p>Issues: <a href="https://github.com/jkmaxwell/medusa_tools/issues">https://github.com/jkmaxwell/medusa_tools/issues</a></p>
+</div>
 
-<div style="display: grid; gap: 1.5rem; margin-bottom: 2rem;">
-    <div style="display: flex; align-items: flex-start; gap: 1rem;">
-        <div style="background: #667eea; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">1</div>
-        <div>
-            <h3 style="margin-bottom: 0.5rem; color: #667eea;">Create Wavetable Banks</h3>
-            <p style="color: #666;">Upload your audio files and create custom wavetable banks for your Medusa. Supports WAV, AIFF, MP3, and OGG formats. Choose between alphabetical or random ordering.</p>
-            <a href="{{ url_for('create_wavetable') }}" style="color: #667eea; text-decoration: none; font-weight: 600;">Create Wavetables →</a>
+<!-- CREATE WAVETABLE SECTION -->
+<div class="card">
+    <div class="window-title">Create Wavetable Bank</div>
+    <form method="POST" action="{{ url_for('create_wavetable') }}" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="create_files">Select Audio Files</label>
+            <input type="file" id="create_files" name="files" multiple accept=".wav,.aif,.aiff,.mp3,.ogg" required>
+            <div class="file-info">
+                Choose up to 64 audio files. Files will be automatically converted to the correct format.
+                If you select more than 64 files, only the first 64 will be used (based on ordering below).
+            </div>
         </div>
-    </div>
+        
+        <div class="form-group">
+            <label for="create_output_filename">Output Filename</label>
+            <input type="text" id="create_output_filename" name="output_filename" value="wavetables.polyend" placeholder="wavetables.polyend">
+            <div class="file-info">
+                The filename for your wavetable bank. '.polyend' extension will be added automatically if missing.
+            </div>
+        </div>
+        
+        <div class="checkbox-group">
+            <input type="checkbox" id="create_random_order" name="random_order">
+            <label for="create_random_order">Random file ordering</label>
+        </div>
+        <div class="file-info" style="margin-top: 4px;">
+            By default, files are processed in alphabetical order. 
+            Check this box to randomize the order for experimental results.
+        </div>
+        
+        <button type="submit" class="btn" style="margin-top: 12px;">Create Wavetable Bank</button>
+    </form>
     
-    <div style="display: flex; align-items: flex-start; gap: 1rem;">
-        <div style="background: #764ba2; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">2</div>
-        <div>
-            <h3 style="margin-bottom: 0.5rem; color: #764ba2;">Decompile Wavetables</h3>
-            <p style="color: #666;">Extract individual wavetables from .polyend files as WAV files. Perfect for editing, analyzing, or backing up your wavetables.</p>
-            <a href="{{ url_for('decompile_wavetable_route') }}" style="color: #764ba2; text-decoration: none; font-weight: 600;">Decompile Wavetables →</a>
-        </div>
-    </div>
-    
-    <div style="display: flex; align-items: flex-start; gap: 1rem;">
-        <div style="background: #2dd4bf; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;">3</div>
-        <div>
-            <h3 style="margin-bottom: 0.5rem; color: #2dd4bf;">Recompile Wavetables</h3>
-            <p style="color: #666;">After editing your extracted WAV files, recompile them back into a .polyend file ready for your Medusa synthesizer.</p>
-            <a href="{{ url_for('recompile_wavetable_route') }}" style="color: #2dd4bf; text-decoration: none; font-weight: 600;">Recompile Wavetables →</a>
+    <div class="form-group" style="background-color: rgba(255, 255, 255, 0.5); margin-top: 12px;">
+        <label>Tips for Best Results</label>
+        <div style="background-color: #ffffff; border: 1px solid #808080; border-top-color: #404040; border-left-color: #404040; border-right-color: #ffffff; border-bottom-color: #ffffff; padding: 8px; font-size: 11px;">
+            <div style="margin-bottom: 4px;">• Use high-quality source audio (44.1kHz or higher)</div>
+            <div style="margin-bottom: 4px;">• Single-cycle waveforms work best</div>
+            <div style="margin-bottom: 4px;">• Avoid audio with DC offset or excessive silence</div>
+            <div style="margin-bottom: 4px;">• Name your files thoughtfully - they'll be processed alphabetically</div>
+            <div>• The tool automatically normalizes levels and finds zero-crossings</div>
         </div>
     </div>
 </div>
 
-<div style="background: #f1f5f9; border-radius: 8px; padding: 1.5rem; border-left: 4px solid #667eea;">
-    <h4 style="margin-bottom: 1rem; color: #667eea;">✨ Why Use the Web Version?</h4>
-    <ul style="list-style: none; padding: 0; color: #666;">
-        <li style="margin-bottom: 0.5rem;">🚫 No macOS quarantine restrictions</li>
-        <li style="margin-bottom: 0.5rem;">💾 No installation required</li>
-        <li style="margin-bottom: 0.5rem;">🌍 Works on any device with a browser</li>
-        <li style="margin-bottom: 0.5rem;">🔄 Always up-to-date</li>
-        <li style="margin-bottom: 0.5rem;">🔒 Files are processed securely and deleted after 1 hour</li>
-    </ul>
+<!-- DECOMPILE WAVETABLE SECTION -->
+<div class="card">
+    <div class="window-title">Decompile Wavetable</div>
+    <form method="POST" action="{{ url_for('decompile_wavetable_route') }}" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="decompile_file">Select .polyend File</label>
+            <input type="file" id="decompile_file" name="file" accept=".polyend" required>
+            <div class="file-info">
+                Choose a .polyend wavetable file from your Medusa synthesizer.
+                The file will be processed and all 64 wavetables will be extracted as a ZIP file.
+            </div>
+        </div>
+        
+        <button type="submit" class="btn" style="margin-top: 12px;">Decompile Wavetable</button>
+    </form>
 </div>
 
-<div style="margin-top: 2rem; text-align: center; color: #666;">
-    <p>Need the command-line version? <a href="https://github.com/jkmaxwell/medusa_tools" style="color: #667eea;">Check out the CLI tools</a></p>
+<!-- RECOMPILE WAVETABLE SECTION -->
+<div class="card">
+    <div class="window-title">Recompile Wavetable</div>
+    <form method="POST" action="{{ url_for('recompile_wavetable_route') }}" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="recompile_files">Select WAV Files</label>
+            <input type="file" id="recompile_files" name="files" multiple accept=".wav" required>
+            <div class="file-info">
+                Select all 64 WAV files (wavetable_00.wav through wavetable_63.wav).
+                Files must be 44.1kHz, 16-bit, mono format.
+            </div>
+        </div>
+        
+        <div class="form-group">
+            <label for="recompile_output_filename">Output Filename</label>
+            <input type="text" id="recompile_output_filename" name="output_filename" value="recompiled.polyend" placeholder="recompiled.polyend">
+            <div class="file-info">
+                The filename for your recompiled wavetable bank. '.polyend' extension will be added automatically if missing.
+            </div>
+        </div>
+        
+        <button type="submit" class="btn" style="margin-top: 12px;">Recompile Wavetable</button>
+    </form>
 </div>
+
+
 {% endblock %} 

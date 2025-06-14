@@ -15,10 +15,12 @@ from medusa_core import create_wavetable_bank, decompile_wavetable, recompile_wa
 from version import __version__, __app_name__
 
 app = Flask(__name__)
-app.secret_key = 'medusa-wavetable-secret-key-change-in-production'
+
+# Configuration - use environment variables in production
+app.secret_key = os.environ.get('SECRET_KEY', 'medusa-wavetable-secret-key-change-in-production')
 
 # Configuration
-UPLOAD_FOLDER = tempfile.mkdtemp(prefix='medusa_web_')
+UPLOAD_FOLDER = os.environ.get('UPLOAD_FOLDER', tempfile.mkdtemp(prefix='medusa_web_'))
 ALLOWED_EXTENSIONS = {'wav', 'aif', 'aiff', 'mp3', 'ogg', 'polyend'}
 MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100MB max upload
 
