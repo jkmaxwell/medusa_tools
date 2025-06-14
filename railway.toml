@@ -1,6 +1,9 @@
 [build]
 builder = "nixpacks"
 
+[build.env]
+NIXPACKS_PYTHON_REQUIREMENTS_FILE = "requirements_web.txt"
+
 [deploy]
 startCommand = "gunicorn --bind 0.0.0.0:$PORT web_app:app --timeout 120 --workers 2"
 healthcheckPath = "/"
