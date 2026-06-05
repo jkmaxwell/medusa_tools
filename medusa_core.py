@@ -1,9 +1,13 @@
 #!/usr/bin/env python3
 
 import os
+import sys
 import wave
 import struct
 import shutil
+import random
+import glob
+import tempfile
 import subprocess
 from pathlib import Path
 
@@ -218,22 +222,14 @@ def recompile_wavetable(input_dir, output_file):
             'error': str(e)
         }
 
-import subprocess
-import random
-import glob
-import tempfile
-import sys
-
 def get_temp_dir():
-    """Get a sandbox-compatible temporary directory."""
+    """Get a writable temporary directory that works both frozen and in development."""
     if getattr(sys, 'frozen', False):
-        # When running as app bundle, use app container temp directory
-        app_path = os.path.dirname(os.path.dirname(sys.executable))
-        temp_base = os.path.join(app_path, 'Contents', 'Resources', 'temp')
-        os.makedirs(temp_base, exist_ok=True)
-        return tempfile.mkdtemp(dir=temp_base, prefix='medusa_')
+        # Use the user's cache directory — never write into the signed app bundle
+        cache_dir = os.path.join(os.path.expanduser('~'), 'Library', 'Caches', 'com.code404.medusa')
+        os.makedirs(cache_dir, exist_ok=True)
+        return tempfile.mkdtemp(dir=cache_dir, prefix='medusa_')
     else:
-        # In development, use system temp directory
         return tempfile.mkdtemp(prefix='medusa_')
 
 def get_ffmpeg_path():
@@ -369,9 +365,10 @@ def process_wavs(input_dir, output_dir):
                 
                 # Convert to mono if stereo
                 if wav_in.getnchannels() == 2:
-                    # Manual stereo to mono conversion
+                    if wav_in.getsampwidth() != 2:
+                        raise Exception(f"{wav_path.name}: stereo-to-mono conversion requires 16-bit audio (got {wav_in.getsampwidth() * 8}-bit)")
                     data = []
-                    for j in range(0, len(frames), 4):  # 4 bytes per stereo sample (2 channels * 2 bytes per sample)
+                    for j in range(0, len(frames), 4):
                         left = struct.unpack('<h', frames[j:j+2])[0]
                         right = struct.unpack('<h', frames[j+2:j+4])[0]
                         mono = (left + right) // 2
@@ -412,6 +409,6 @@ def is_app_quarantined():
                 result = subprocess.run(['xattr', '-p', 'com.apple.quarantine', app_path], 
                                       capture_output=True, text=True)
                 return result.returncode == 0
-    except:
+    except Exception:
         pass
     return False

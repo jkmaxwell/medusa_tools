@@ -6,8 +6,8 @@ set -e
 # Configuration
 APP_NAME="Medusa Wavetable Utility"
 APP_PATH="dist/${APP_NAME}.app"
-CERT_NAME="PolyendMedusaToolSelfSignCert"  # This should match the name of your certificate in Keychain Access
-VERSION=$(python -c "from version import __version__; print(__version__)")
+CERT_NAME="Developer ID Application: Justin Maxwell (52BMULT3J4)"
+VERSION=$(python3 -c "from version import __version__; print(__version__)")
 
 # Colors for output
 RED='\033[0;31m'
@@ -36,22 +36,64 @@ if [ ! -d "$APP_PATH" ]; then
     exit 1
 fi
 
-# Sign the app with existing certificate
-echo "Signing the app..."
-codesign --force --deep --sign "$CERT_NAME" "$APP_PATH"
+# Sign the app from inside out — --deep is unreliable for PyInstaller bundles
+# with nested frameworks. We must sign inner binaries before outer ones.
+echo "Signing binaries (inside out)..."
+
+sign_binary() {
+    codesign --force --options runtime --timestamp \
+        --entitlements entitlements.plist \
+        --sign "$CERT_NAME" "$1" 2>/dev/null || true
+}
+
+# 1. Sign every Mach-O file (catches .dylib, .so, executables, Qt frameworks
+#    without extensions, and shared libraries) — deepest paths first
+while IFS= read -r f; do
+    if file "$f" | grep -q "Mach-O"; then
+        sign_binary "$f"
+    fi
+done < <(find "$APP_PATH" -type f | awk '{ print length, $0 }' | sort -rn | cut -d' ' -f2-)
+
+# 2. Sign .framework bundles deepest first
+while IFS= read -r fw; do
+    sign_binary "$fw"
+done < <(find "$APP_PATH" -name "*.framework" -type d | awk '{ print length, $0 }' | sort -rn | cut -d' ' -f2-)
+
+# 3. Sign the app bundle itself (must be last)
+echo "Signing app bundle..."
+codesign --force --options runtime --timestamp \
+    --entitlements entitlements.plist \
+    --sign "$CERT_NAME" \
+    "$APP_PATH"
 
 # Verify the signature
 echo "Verifying signature..."
 codesign --verify --verbose "$APP_PATH"
 
-# Create zip file
+# Create zip file for distribution
 echo "Creating zip archive..."
 cd dist
-zip -r "${APP_NAME}_v${VERSION}_macos.zip" "${APP_NAME}.app"
+ditto -c -k --keepParent "${APP_NAME}.app" "${APP_NAME}_v${VERSION}_macos.zip"
 cd ..
 
 echo -e "${GREEN}Build completed successfully!${NC}"
 echo -e "The app is available at: ${APP_PATH}"
 echo -e "The zip archive is available at: dist/${APP_NAME}_v${VERSION}_macos.zip"
-echo -e "${YELLOW}Note: This is a development build signed with a self-signed certificate.${NC}"
-echo -e "${YELLOW}Users will need to right-click and select 'Open' the first time they run the app.${NC}" 
+
+# Notarize with Apple
+echo "Submitting for notarization (this may take a few minutes)..."
+xcrun notarytool submit "$(pwd)/dist/${APP_NAME}_v${VERSION}_macos.zip" \
+    --keychain-profile "AC_PASSWORD" \
+    --wait
+
+echo "Stapling notarization ticket..."
+xcrun stapler staple "$APP_PATH"
+
+echo "Re-zipping with stapled app..."
+cd dist
+rm "${APP_NAME}_v${VERSION}_macos.zip"
+ditto -c -k --keepParent "${APP_NAME}.app" "${APP_NAME}_v${VERSION}_macos.zip"
+cd ..
+
+echo -e "${GREEN}Done! Notarized and stapled.${NC}"
+echo -e "Distribute: dist/${APP_NAME}_v${VERSION}_macos.zip" 

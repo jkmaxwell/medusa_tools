@@ -6,12 +6,24 @@
 # Minor version for new functionality in a backwards compatible manner
 # Patch version for backwards compatible bug fixes
 
-__version__ = "1.5.1"
+__version__ = "1.5.2"
 __author__ = "jkmaxwell"
 __app_name__ = "Medusa Wavetable Utility"
 
 # Update history
 VERSION_HISTORY = {
+    "1.5.2": {
+        "date": "2026-06-04",
+        "changes": [
+            "Fixed GUI crash on launch for all users (missing resources_rc in bundle)",
+            "Switched to Developer ID signing and notarization — no Gatekeeper warnings",
+            "Fixed UI freezing during long operations (background threading)",
+            "Fixed temp directory writing inside signed app bundle",
+            "Fixed FFmpeg path detection for Intel and Apple Silicon",
+            "Dropped app sandbox entitlements that were breaking file access",
+            "Fixed version mismatch in app bundle Info.plist",
+        ]
+    },
     "1.5.1": {
         "date": "2025-06-12",
         "changes": [

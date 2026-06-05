@@ -85,7 +85,7 @@ def get_latest_github_release():
     """Fetch the latest release information from GitHub."""
     url = "https://api.github.com/repos/jkmaxwell/medusa_tools/releases/latest"
     try:
-        with urllib.request.urlopen(url) as response:
+        with urllib.request.urlopen(url, timeout=5) as response:
             data = json.loads(response.read().decode())
             return {
                 'version': data['tag_name'].lstrip('v'),

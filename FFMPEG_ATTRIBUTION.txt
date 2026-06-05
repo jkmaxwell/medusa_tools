@@ -1,0 +1,7 @@
+This application includes FFmpeg (https://ffmpeg.org/), licensed under the
+GNU Lesser General Public License (LGPL) version 2.1 or later.
+
+FFmpeg source code is available at: https://ffmpeg.org/download.html
+
+A copy of the LGPL license is available at:
+https://www.gnu.org/licenses/lgpl-2.1.html

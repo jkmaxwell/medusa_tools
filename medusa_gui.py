@@ -6,11 +6,25 @@ import resources_rc
 from PySide6.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                               QPushButton, QLabel, QFileDialog, QMessageBox, QButtonGroup,
                               QRadioButton, QMenuBar, QMenu, QGroupBox, QStatusBar)
-from PySide6.QtCore import Qt, QSize, QUrl
+from PySide6.QtCore import Qt, QSize, QUrl, QThread, Signal
 from PySide6.QtGui import QPixmap, QDesktopServices
 from medusa_core import decompile_wavetable, recompile_wavetable, process_wavs, create_wavetable_bank, is_app_quarantined
 from version import __version__ as VERSION, __app_name__ as APP_NAME
 from tools.version_manager import check_for_updates
+
+class Worker(QThread):
+    finished = Signal(object)
+
+    def __init__(self, fn, *args, **kwargs):
+        super().__init__()
+        self._fn = fn
+        self._args = args
+        self._kwargs = kwargs
+
+    def run(self):
+        result = self._fn(*self._args, **self._kwargs)
+        self.finished.emit(result)
+
 
 class MedusaApp(QMainWindow):
     def __init__(self):
@@ -231,7 +245,7 @@ class MedusaApp(QMainWindow):
         
         # Create link label
         link_label = QLabel()
-        link_label.setText('<a href="https://github.com/jkmaxwell/medusa_tools" style="color: #0000EE; text-decoration: underline;">2025 Justin Maxwell</a>')
+        link_label.setText('<a href="https://github.com/jkmaxwell/medusa_tools" style="color: #0000EE; text-decoration: underline;">© 2025 Justin Maxwell</a>')
         link_label.setTextFormat(Qt.TextFormat.RichText)
         link_label.setOpenExternalLinks(True)
         
@@ -240,13 +254,19 @@ class MedusaApp(QMainWindow):
         status_bar.showMessage("Ready")
     
     def update_status(self, message):
-        """Update status bar message."""
         self.statusBar().showMessage(message)
+
+    def _set_buttons_enabled(self, enabled):
+        for btn in self.findChildren(QPushButton):
+            btn.setEnabled(enabled)
+
+    def _run_operation(self, fn, args, on_done, **kwargs):
+        self._set_buttons_enabled(False)
+        self._worker = Worker(fn, *args, **kwargs)
+        self._worker.finished.connect(on_done)
+        self._worker.start()
     
     def select_decompile_input(self):
-        self.update_status("Selecting file to decompile...")
-        
-        # Check for quarantine and warn user
         if is_app_quarantined():
             msg = QMessageBox(self)
             msg.setWindowTitle("App Quarantine Detected")
@@ -258,137 +278,122 @@ class MedusaApp(QMainWindow):
                 "Or simply select a writable output directory when prompted."
             )
             msg.exec()
-        
+
         dialog = QFileDialog(self)
         dialog.setWindowTitle("Select Medusa Wavetable File")
         dialog.setNameFilter("Polyend Files (*.polyend)")
         dialog.setFileMode(QFileDialog.FileMode.ExistingFile)
         dialog.setViewMode(QFileDialog.ViewMode.Detail)
-        
-        if dialog.exec() == QFileDialog.DialogCode.Accepted:
-            input_file = dialog.selectedFiles()[0]
-            
-            # Ask user where to save the extracted wavetables
-            output_dir = QFileDialog.getExistingDirectory(
-                self,
-                "Select Directory to Save Extracted Wavetables",
-                os.path.expanduser("~/Documents"),  # Default to Documents folder
-                QFileDialog.Option.ShowDirsOnly
-            )
-            
-            if not output_dir:
-                self.update_status("Ready")
-                return
-                
-            self.update_status(f"Decompiling {os.path.basename(input_file)}...")
-            result = decompile_wavetable(input_file, output_dir)
-            if result['success']:
-                QMessageBox.information(
-                    self,
-                    "Success",
-                    f"Extracted {result['num_wavetables']} wavetables to {result['output_dir']}"
-                )
-            else:
-                QMessageBox.critical(
-                    self,
-                    "Error",
-                    f"Error decompiling wavetable: {result['error']}"
-                )
+
+        if dialog.exec() != QFileDialog.DialogCode.Accepted:
+            return
+        input_file = dialog.selectedFiles()[0]
+
+        output_dir = QFileDialog.getExistingDirectory(
+            self,
+            "Select Directory to Save Extracted Wavetables",
+            os.path.expanduser("~/Documents"),
+            QFileDialog.Option.ShowDirsOnly
+        )
+        if not output_dir:
+            return
+
+        self.update_status(f"Decompiling {os.path.basename(input_file)}...")
+        self._run_operation(decompile_wavetable, (input_file, output_dir), self._on_decompile_done)
+
+    def _on_decompile_done(self, result):
+        self._set_buttons_enabled(True)
+        if result['success']:
+            QMessageBox.information(self, "Success",
+                f"Extracted {result['num_wavetables']} wavetables to {result['output_dir']}")
+        else:
+            QMessageBox.critical(self, "Error", f"Error decompiling wavetable: {result['error']}")
         self.update_status("Ready")
-    
+
     def select_recompile_input(self):
-        self.update_status("Selecting files to recompile...")
         dialog = QFileDialog(self)
         dialog.setWindowTitle("Select Directory Containing Wavetable WAV Files")
         dialog.setFileMode(QFileDialog.FileMode.Directory)
         dialog.setOption(QFileDialog.Option.ShowDirsOnly)
-        
-        if dialog.exec() == QFileDialog.DialogCode.Accepted:
-            input_dir = dialog.selectedFiles()[0]
-            
-            parent_dir = os.path.dirname(input_dir)
-            default_output = os.path.join(parent_dir, "recompiled.polyend")
-            
-            save_dialog = QFileDialog(self)
-            save_dialog.setWindowTitle("Save Recompiled Wavetable File As")
-            save_dialog.setNameFilter("Polyend Files (*.polyend)")
-            save_dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
-            save_dialog.setDirectory(parent_dir)
-            save_dialog.selectFile("recompiled.polyend")
-            
-            if save_dialog.exec() == QFileDialog.DialogCode.Accepted:
-                output_file = save_dialog.selectedFiles()[0]
-                self.update_status("Recompiling wavetables...")
-                result = recompile_wavetable(input_dir, output_file)
-                if result['success']:
-                    QMessageBox.information(
-                        self,
-                        "Success",
-                        f"Successfully recompiled {result['num_wavetables']} wavetables to {result['output_file']}"
-                    )
-                else:
-                    QMessageBox.critical(
-                        self,
-                        "Error",
-                        f"Error recompiling wavetables: {result['error']}"
-                    )
+
+        if dialog.exec() != QFileDialog.DialogCode.Accepted:
+            return
+        input_dir = dialog.selectedFiles()[0]
+
+        parent_dir = os.path.dirname(input_dir)
+        save_dialog = QFileDialog(self)
+        save_dialog.setWindowTitle("Save Recompiled Wavetable File As")
+        save_dialog.setNameFilter("Polyend Files (*.polyend)")
+        save_dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
+        save_dialog.setDirectory(parent_dir)
+        save_dialog.selectFile("recompiled.polyend")
+
+        if save_dialog.exec() != QFileDialog.DialogCode.Accepted:
+            return
+        output_file = save_dialog.selectedFiles()[0]
+
+        self.update_status("Recompiling wavetables...")
+        self._run_operation(recompile_wavetable, (input_dir, output_file), self._on_recompile_done)
+
+    def _on_recompile_done(self, result):
+        self._set_buttons_enabled(True)
+        if result['success']:
+            QMessageBox.information(self, "Success",
+                f"Successfully recompiled {result['num_wavetables']} wavetables to {result['output_file']}")
+        else:
+            QMessageBox.critical(self, "Error", f"Error recompiling wavetables: {result['error']}")
         self.update_status("Ready")
-    
+
     def select_create_input(self):
-        self.update_status("Selecting audio files...")
         input_dir = QFileDialog.getExistingDirectory(
             self,
             "Select Directory Containing Audio Files",
             "",
             QFileDialog.Option.ShowDirsOnly
         )
-        
         if not input_dir:
-            self.update_status("Ready")
             return
-            
+
         random_mode = self.selection_group.checkedButton().text() == "Random"
-        
+
         output_file, _ = QFileDialog.getSaveFileName(
             self,
             "Save Wavetable Bank As",
             "wavetables.polyend",
             "Polyend Files (*.polyend)"
         )
-        
         if not output_file:
-            self.update_status("Ready")
             return
-            
-        self.update_status("Creating wavetable bank...")
-        result = create_wavetable_bank(
-            input_dir,
-            output_file,
+
+        self.update_status("Creating wavetable bank (this may take a moment)...")
+        self._run_operation(
+            create_wavetable_bank,
+            (input_dir, output_file),
+            self._on_create_done,
             random_order=random_mode
         )
-        
+
+    def _on_create_done(self, result):
+        self._set_buttons_enabled(True)
         if result['success']:
-            QMessageBox.information(
-                self,
-                "Success",
+            QMessageBox.information(self, "Success",
                 f"Successfully created wavetable bank:\n"
                 f"- Output file: {result['output_file']}\n"
                 f"- Number of wavetables: {result['num_wavetables']}\n"
-                f"- Source files: {len(result['source_files'])}"
-            )
+                f"- Source files: {len(result['source_files'])}")
         else:
-            QMessageBox.critical(
-                self,
-                "Error",
-                f"Error creating wavetable bank: {result['error']}"
-            )
+            QMessageBox.critical(self, "Error", f"Error creating wavetable bank: {result['error']}")
         self.update_status("Ready")
     
     def check_updates(self):
-        """Check for available updates and notify user."""
         self.update_status("Checking for updates...")
-        update_info = check_for_updates()
-        
+        self._set_buttons_enabled(False)
+        self._update_worker = Worker(check_for_updates)
+        self._update_worker.finished.connect(self._on_update_check_done)
+        self._update_worker.start()
+
+    def _on_update_check_done(self, update_info):
+        self._set_buttons_enabled(True)
         if update_info:
             msg = QMessageBox(self)
             msg.setWindowTitle("Update Available")
@@ -403,15 +408,11 @@ class MedusaApp(QMainWindow):
             )
             msg.setStandardButtons(QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             msg.setDefaultButton(QMessageBox.StandardButton.Yes)
-            
             if msg.exec() == QMessageBox.StandardButton.Yes:
                 QDesktopServices.openUrl(QUrl(update_info['download_url']))
         else:
-            QMessageBox.information(
-                self,
-                "No Updates Available",
-                f"You're running the latest version ({VERSION})!"
-            )
+            QMessageBox.information(self, "No Updates Available",
+                f"You're running the latest version ({VERSION})!")
         self.update_status("Ready")
     
     def about(self):
@@ -427,7 +428,7 @@ class MedusaApp(QMainWindow):
             "<li>Create wavetable banks from audio files</li>"
             "<li>Support for random or alphabetical file selection</li>"
             "</ul>"
-            "<p>© 2024 All rights reserved.</p>"
+            "<p>© 2025 Justin Maxwell. All rights reserved.</p>"
         )
         about_box.setStyleSheet(self.styleSheet())
         about_box.exec()

@@ -1,8 +1,33 @@
 # -*- mode: python ; coding: utf-8 -*-
+import os
+import re
+import subprocess
 
-block_cipher = None
+# Read version dynamically from version.py
+with open('version.py') as _f:
+    _content = _f.read()
+_match = re.search(r"__version__ = ['\"]([^'\"]+)['\"]", _content)
+APP_VERSION = _match.group(1)
 
-# Common analysis settings
+# Find FFmpeg at build time (handles both Apple Silicon and Intel)
+def _find_ffmpeg():
+    try:
+        result = subprocess.run(['which', 'ffmpeg'], capture_output=True, text=True, check=True)
+        path = result.stdout.strip()
+        if path and os.path.exists(path):
+            return path
+    except subprocess.CalledProcessError:
+        pass
+    for p in ['/opt/homebrew/bin/ffmpeg', '/usr/local/bin/ffmpeg', '/usr/bin/ffmpeg']:
+        if os.path.exists(p):
+            return p
+    raise RuntimeError("FFmpeg not found. Install with: brew install ffmpeg")
+
+FFMPEG_PATH = _find_ffmpeg()
+
+# Shared hiddenimports for both CLI and GUI
+COMMON_HIDDEN = ['resources_rc', 'packaging', 'packaging.version']
+
 common_analysis = {
     'pathex': [],
     'binaries': [],
@@ -11,16 +36,17 @@ common_analysis = {
         ('version.py', '.'),
         ('styles', 'styles'),
         ('tools/version_manager.py', 'tools'),
-        ('/opt/homebrew/bin/ffmpeg', 'Resources'),
+        (FFMPEG_PATH, 'Resources'),
+        ('FFMPEG_ATTRIBUTION.txt', 'Resources'),
     ],
-    'hiddenimports': ['resources_rc', 'packaging', 'packaging.version'],
+    'hiddenimports': COMMON_HIDDEN,
     'excludes': ['tkinter', 'PyQt5', 'PyQt6'],
-    'hookspath': ['/Users/jkm/dev/medusa_tools/venv/lib/python3.13/site-packages/PyInstaller/hooks'],
+    'hookspath': [],
     'hooksconfig': {},
     'runtime_hooks': [],
     'win_no_prefer_redirects': False,
     'win_private_assemblies': False,
-    'cipher': block_cipher,
+    'cipher': None,
     'noarchive': False,
 }
 
@@ -30,7 +56,7 @@ cli_a = Analysis(
     **common_analysis
 )
 
-cli_pyz = PYZ(cli_a.pure, cli_a.zipped_data, cipher=block_cipher)
+cli_pyz = PYZ(cli_a.pure, cli_a.zipped_data, cipher=None)
 
 cli_exe = EXE(
     cli_pyz,
@@ -40,8 +66,6 @@ cli_exe = EXE(
     name='medusa_cli',
     debug=False,
     bootloader_ignore_signals=False,
-    runtime_tmpdir=None,
-    bootloader='bootloader/Darwin-64bit/run',
     strip=False,
     upx=True,
     console=True,
@@ -63,24 +87,24 @@ cli_coll = COLLECT(
     name='medusa_cli',
 )
 
-# GUI version
+# GUI version — merge common hidden imports with GUI-specific ones
 gui_a = Analysis(
     ['medusa_gui.py'],
     **{
         **common_analysis,
-        'hiddenimports': [
+        'hiddenimports': COMMON_HIDDEN + [
             'PySide6',
             'PySide6.QtCore',
             'PySide6.QtWidgets',
             'PySide6.QtGui',
             'shiboken6',
             'numpy',
-            'numpy.core'
+            'numpy.core',
         ]
     }
 )
 
-gui_pyz = PYZ(gui_a.pure, gui_a.zipped_data, cipher=block_cipher)
+gui_pyz = PYZ(gui_a.pure, gui_a.zipped_data, cipher=None)
 
 gui_exe = EXE(
     gui_pyz,
@@ -111,7 +135,6 @@ gui_coll = COLLECT(
     name='Medusa_Wavetable_Utility',
 )
 
-# Only create app bundle for GUI version
 app = BUNDLE(
     gui_coll,
     name='Medusa Wavetable Utility.app',
@@ -120,10 +143,10 @@ app = BUNDLE(
     info_plist={
         'CFBundleDisplayName': 'Medusa Wavetable Utility',
         'CFBundleName': 'Medusa Wavetable Utility',
-        'CFBundleShortVersionString': '1.4.0',
-        'CFBundleVersion': '1.4.0',
+        'CFBundleShortVersionString': APP_VERSION,
+        'CFBundleVersion': APP_VERSION,
         'NSHighResolutionCapable': 'True',
         'LSBackgroundOnly': 'False',
-        'NSHumanReadableCopyright': '© 2024',
+        'NSHumanReadableCopyright': f'© 2025 Justin Maxwell',
     }
 )
