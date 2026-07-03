@@ -104,10 +104,21 @@ FOOTER_DATA = (
 def decompile_wavetable(input_file, output_dir=None):
     """Extract wavetables from .polyend file to WAV files."""
     try:
+        # Read and validate the polyend file before touching the output location
+        with open(input_file, 'rb') as f:
+            data = f.read()
+
+        if len(data) != TOTAL_FILE_SIZE:
+            raise Exception(
+                f"Not a valid Medusa wavetable file: expected {TOTAL_FILE_SIZE} bytes, "
+                f"got {len(data)}")
+        if data[0:4] != FIRST_HEADER_MARKER:
+            raise Exception("Not a valid Medusa wavetable file: header marker not found")
+
         # Use waves directory next to input file if no output dir specified
         if output_dir is None:
             output_dir = os.path.join(os.path.dirname(input_file), 'waves')
-            
+
         # Try to create the output directory, with fallback for permission issues
         try:
             os.makedirs(output_dir, exist_ok=True)
@@ -121,13 +132,9 @@ def decompile_wavetable(input_file, output_dir=None):
             else:
                 # Re-raise the error if user specifically chose this location
                 raise
-        
-        # Read the polyend file
-        with open(input_file, 'rb') as f:
-            data = f.read()
-        
+
         # Extract wavetables
-        num_wavetables = len(data) // WAVETABLE_SIZE
+        num_wavetables = NUM_WAVETABLES
         extracted_files = []
         
         for i in range(num_wavetables):
@@ -165,15 +172,21 @@ def decompile_wavetable(input_file, output_dir=None):
 def recompile_wavetable(input_dir, output_file):
     """Create .polyend file from WAV files."""
     try:
+        missing = [f'wavetable_{i:02d}.wav' for i in range(NUM_WAVETABLES)
+                   if not os.path.exists(os.path.join(input_dir, f'wavetable_{i:02d}.wav'))]
+        if missing:
+            found = NUM_WAVETABLES - len(missing)
+            raise Exception(
+                f"Found {found} of {NUM_WAVETABLES} required WAV files in {input_dir} "
+                f"(expected wavetable_00.wav through wavetable_63.wav; "
+                f"first missing: {missing[0]})")
+
         wavetables = []
         processed_files = []
-        
+
         for i in range(NUM_WAVETABLES):
             wav_file = os.path.join(input_dir, f'wavetable_{i:02d}.wav')
-            
-            if not os.path.exists(wav_file):
-                raise Exception(f"Missing wavetable_{i:02d}.wav")
-            
+
             with wave.open(wav_file, 'rb') as wav:
                 if wav.getnchannels() != 1 or wav.getsampwidth() != 2:
                     raise Exception(f"Invalid format in {wav_file}")
@@ -235,13 +248,16 @@ def get_temp_dir():
 def get_ffmpeg_path():
     """Get the path to the FFmpeg executable, handling both development and bundled environments."""
     if getattr(sys, 'frozen', False):
-        # When running as app bundle
-        app_path = os.path.dirname(os.path.dirname(sys.executable))
-        ffmpeg_path = os.path.join(app_path, 'Contents', 'Resources', 'ffmpeg')
+        # PyInstaller unpacks bundled data relative to sys._MEIPASS
+        # (Contents/Frameworks inside a .app, _internal for onedir builds)
+        base_path = getattr(sys, '_MEIPASS', os.path.dirname(sys.executable))
+        ffmpeg_path = os.path.join(base_path, 'Resources', 'ffmpeg')
         if not os.path.exists(ffmpeg_path):
             raise Exception(f"FFmpeg not found at {ffmpeg_path}")
-        # Ensure FFmpeg is executable
-        os.chmod(ffmpeg_path, 0o755)
+        try:
+            os.chmod(ffmpeg_path, 0o755)
+        except OSError:
+            pass  # signed/translocated bundles may be read-only
         return ffmpeg_path
     else:
         # First try to find FFmpeg using 'which' command (works on Linux/Railway)
@@ -279,21 +295,21 @@ def create_wavetable_bank(input_dir, output_file, random_order=False):
         
         if not audio_files:
             raise Exception("No audio files found in input directory")
-            
-        # Select files
-        if len(audio_files) > NUM_WAVETABLES:
-            if random_order:
-                audio_files = random.sample(audio_files, NUM_WAVETABLES)
-            else:
-                audio_files = sorted(audio_files)[:NUM_WAVETABLES]
-        
+
+        # Apply the selection mode to the full list, whatever its size
+        if random_order:
+            random.shuffle(audio_files)
+        else:
+            audio_files.sort()
+        audio_files = audio_files[:NUM_WAVETABLES]
+
         # Get FFmpeg path
         ffmpeg_path = get_ffmpeg_path()
-        
+
         # Convert files to WAV format
         converted_files = []
-        for i, audio_file in enumerate(audio_files):
-            output_wav = os.path.join(temp_dir, f'temp_{i:02d}.wav')
+        for audio_file in audio_files:
+            output_wav = os.path.join(temp_dir, f'temp_{len(converted_files):02d}.wav')
             try:
                 subprocess.run([
                     ffmpeg_path, '-y',
@@ -307,9 +323,17 @@ def create_wavetable_bank(input_dir, output_file, random_order=False):
             except subprocess.CalledProcessError as e:
                 print(f"Warning: Failed to convert {audio_file}: {e}")
                 continue
-        
+
         if not converted_files:
             raise Exception("No files were successfully converted")
+
+        # Fewer sources than slots: cycle through them so all 64 slots have sound
+        num_sources = len(converted_files)
+        if num_sources < NUM_WAVETABLES:
+            for i in range(num_sources, NUM_WAVETABLES):
+                cycled = os.path.join(temp_dir, f'temp_{i:02d}.wav')
+                shutil.copyfile(converted_files[i % num_sources], cycled)
+                converted_files.append(cycled)
             
         # Process the converted files
         process_result = process_wavs(temp_dir, os.path.join(temp_dir, 'processed'))
@@ -344,44 +368,74 @@ def create_wavetable_bank(input_dir, output_file, random_order=False):
             'error': str(e)
         }
 
+def _to_16bit_mono(frames, channels, width, name):
+    """Decode raw WAV frames to a list of signed 16-bit mono samples."""
+    if width == 1:
+        # 8-bit WAV data is unsigned
+        samples = [(b - 128) << 8 for b in frames]
+    elif width == 2:
+        samples = list(struct.unpack(f'<{len(frames) // 2}h', frames))
+    elif width == 3:
+        samples = [int.from_bytes(frames[j:j + 3], 'little', signed=True) >> 8
+                   for j in range(0, len(frames) - 2, 3)]
+    elif width == 4:
+        samples = [s >> 16 for s in struct.unpack(f'<{len(frames) // 4}i', frames)]
+    else:
+        raise Exception(f"{name}: unsupported sample width ({width * 8}-bit)")
+
+    if channels > 1:
+        samples = [sum(samples[j:j + channels]) // channels
+                   for j in range(0, len(samples) - channels + 1, channels)]
+    return samples
+
+def _resample_linear(samples, src_rate, dst_rate):
+    """Resample by linear interpolation."""
+    if not samples or src_rate == dst_rate:
+        return samples
+    n_out = max(1, round(len(samples) * dst_rate / src_rate))
+    if n_out == 1 or len(samples) == 1:
+        return [samples[0]] * n_out
+    step = (len(samples) - 1) / (n_out - 1)
+    out = []
+    for k in range(n_out):
+        pos = k * step
+        idx = int(pos)
+        frac = pos - idx
+        if idx + 1 < len(samples):
+            out.append(int(samples[idx] * (1 - frac) + samples[idx + 1] * frac))
+        else:
+            out.append(samples[idx])
+    return out
+
 def process_wavs(input_dir, output_dir):
-    """Convert WAV files to Medusa-compatible format."""
+    """Convert WAV files to Medusa-compatible format (16-bit mono 44.1kHz)."""
     try:
         os.makedirs(output_dir, exist_ok=True)
         processed_files = []
-        
+
         # Get all WAV files from input directory
         wav_files = sorted(Path(input_dir).glob('*.wav'))[:NUM_WAVETABLES]  # Limit to 64 files
         if not wav_files:
             raise Exception("No WAV files found in input directory")
-        
+
         for i, wav_path in enumerate(wav_files):
             output_wav = os.path.join(output_dir, f'wavetable_{i:02d}.wav')
-            
-            # Process WAV file
+
             with wave.open(str(wav_path), 'rb') as wav_in:
-                # Read audio data
+                channels = wav_in.getnchannels()
+                width = wav_in.getsampwidth()
+                rate = wav_in.getframerate()
                 frames = wav_in.readframes(wav_in.getnframes())
-                
-                # Convert to mono if stereo
-                if wav_in.getnchannels() == 2:
-                    if wav_in.getsampwidth() != 2:
-                        raise Exception(f"{wav_path.name}: stereo-to-mono conversion requires 16-bit audio (got {wav_in.getsampwidth() * 8}-bit)")
-                    data = []
-                    for j in range(0, len(frames), 4):
-                        left = struct.unpack('<h', frames[j:j+2])[0]
-                        right = struct.unpack('<h', frames[j+2:j+4])[0]
-                        mono = (left + right) // 2
-                        data.extend(struct.pack('<h', mono))
-                    frames = bytes(data)
-                
-                # Write processed WAV
-                with wave.open(output_wav, 'wb') as wav_out:
-                    wav_out.setnchannels(1)
-                    wav_out.setsampwidth(2)
-                    wav_out.setframerate(44100)
-                    wav_out.writeframes(frames)
-            
+
+            samples = _to_16bit_mono(frames, channels, width, wav_path.name)
+            samples = _resample_linear(samples, rate, 44100)
+
+            with wave.open(output_wav, 'wb') as wav_out:
+                wav_out.setnchannels(1)
+                wav_out.setsampwidth(2)
+                wav_out.setframerate(44100)
+                wav_out.writeframes(struct.pack(f'<{len(samples)}h', *samples))
+
             processed_files.append(output_wav)
         
         return {

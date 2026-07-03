@@ -5,6 +5,7 @@ Provides browser-based access to wavetable creation and manipulation tools.
 """
 
 import os
+import time
 import tempfile
 import shutil
 import zipfile
@@ -33,22 +34,31 @@ def allowed_file(filename):
 def cleanup_temp_files():
     """Clean up old temporary files"""
     try:
+        cutoff = time.time() - 3600
         for item in os.listdir(UPLOAD_FOLDER):
             item_path = os.path.join(UPLOAD_FOLDER, item)
+            if os.path.getmtime(item_path) >= cutoff:
+                continue
             if os.path.isfile(item_path):
-                # Delete files older than 1 hour
-                if os.path.getmtime(item_path) < (os.time.time() - 3600):
-                    os.remove(item_path)
+                os.remove(item_path)
             elif os.path.isdir(item_path):
-                # Delete directories older than 1 hour
-                if os.path.getmtime(item_path) < (os.time.time() - 3600):
-                    shutil.rmtree(item_path)
+                shutil.rmtree(item_path)
     except Exception as e:
         print(f"Cleanup error: {e}")
 
+_last_cleanup = 0.0
+
+@app.before_request
+def periodic_cleanup():
+    """Sweep stale upload dirs at most once every 5 minutes, on any request."""
+    global _last_cleanup
+    now = time.time()
+    if now - _last_cleanup > 300:
+        _last_cleanup = now
+        cleanup_temp_files()
+
 @app.route('/')
 def index():
-    cleanup_temp_files()
     return render_template('index.html', version=__version__, app_name=__app_name__)
 
 @app.route('/create', methods=['GET', 'POST'])
@@ -66,9 +76,9 @@ def create_wavetable():
         flash('No files selected')
         return redirect(request.url)
     
-    # Get options
+    # Get options — sanitize the user-supplied filename so it can't escape the temp dir
     random_order = request.form.get('random_order') == 'on'
-    output_filename = request.form.get('output_filename', 'wavetables.polyend')
+    output_filename = secure_filename(request.form.get('output_filename', '')) or 'wavetables.polyend'
     if not output_filename.endswith('.polyend'):
         output_filename += '.polyend'
     
@@ -180,8 +190,8 @@ def recompile_wavetable_route():
         flash('No files selected')
         return redirect(request.url)
     
-    # Get output filename
-    output_filename = request.form.get('output_filename', 'recompiled.polyend')
+    # Get output filename — sanitize so it can't escape the temp dir
+    output_filename = secure_filename(request.form.get('output_filename', '')) or 'recompiled.polyend'
     if not output_filename.endswith('.polyend'):
         output_filename += '.polyend'
     
@@ -233,18 +243,18 @@ def api_status():
     })
 
 if __name__ == '__main__':
-    import os
-    
     # Use environment variable or default to port 5001 (avoiding macOS AirPlay on 5000)
     port = int(os.environ.get('PORT', 5001))
-    
+    # Debug mode (Werkzeug debugger allows code execution) must be opted into explicitly
+    debug = os.environ.get('FLASK_DEBUG', '').lower() in ('1', 'true', 'yes')
+
     print(f"Starting {__app_name__} Web Interface v{__version__}")
     print(f"Upload folder: {UPLOAD_FOLDER}")
     print(f"Server starting on: http://localhost:{port}")
     print("Press Ctrl+C to stop")
-    
+
     try:
-        app.run(debug=True, host='0.0.0.0', port=port)
+        app.run(debug=debug, host='0.0.0.0', port=port)
     except OSError as e:
         if "Address already in use" in str(e):
             print(f"\n❌ Port {port} is already in use!")

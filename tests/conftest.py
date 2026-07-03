@@ -28,6 +28,10 @@ def temp_output_dir(tmp_path):
     shutil.rmtree(output_dir)
 
 @pytest.fixture
-def sample_waves_dir(test_data_dir):
-    """Return the path to the sample waves directory."""
-    return test_data_dir / 'valid' / 'waves' 
+def sample_waves_dir(valid_polyend_file, tmp_path):
+    """Generate the 64 wavetable WAVs by decompiling the valid fixture file."""
+    from medusa_core import decompile_wavetable
+    waves_dir = tmp_path / 'sample_waves'
+    result = decompile_wavetable(str(valid_polyend_file), str(waves_dir))
+    assert result['success'], f"fixture decompile failed: {result.get('error')}"
+    return waves_dir

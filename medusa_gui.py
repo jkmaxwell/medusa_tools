@@ -22,7 +22,10 @@ class Worker(QThread):
         self._kwargs = kwargs
 
     def run(self):
-        result = self._fn(*self._args, **self._kwargs)
+        try:
+            result = self._fn(*self._args, **self._kwargs)
+        except Exception as e:
+            result = {'success': False, 'error': str(e)}
         self.finished.emit(result)
 
 
@@ -167,7 +170,7 @@ class MedusaApp(QMainWindow):
         # Help menu
         help_menu = QMenu("&Help", self)
         menubar.addMenu(help_menu)
-        help_menu.addAction("Check for &Updates", self.check_updates)
+        self._update_action = help_menu.addAction("Check for &Updates", self.check_updates)
         help_menu.addSeparator()
         help_menu.addAction("&About", self.about)
         
@@ -259,8 +262,12 @@ class MedusaApp(QMainWindow):
     def _set_buttons_enabled(self, enabled):
         for btn in self.findChildren(QPushButton):
             btn.setEnabled(enabled)
+        self._update_action.setEnabled(enabled)
 
     def _run_operation(self, fn, args, on_done, **kwargs):
+        worker = getattr(self, '_worker', None)
+        if worker is not None and worker.isRunning():
+            return
         self._set_buttons_enabled(False)
         self._worker = Worker(fn, *args, **kwargs)
         self._worker.finished.connect(on_done)
@@ -387,14 +394,14 @@ class MedusaApp(QMainWindow):
     
     def check_updates(self):
         self.update_status("Checking for updates...")
-        self._set_buttons_enabled(False)
-        self._update_worker = Worker(check_for_updates)
-        self._update_worker.finished.connect(self._on_update_check_done)
-        self._update_worker.start()
+        self._run_operation(check_for_updates, (), self._on_update_check_done)
 
     def _on_update_check_done(self, update_info):
         self._set_buttons_enabled(True)
-        if update_info:
+        if isinstance(update_info, dict) and update_info.get('success') is False:
+            QMessageBox.warning(self, "Update Check Failed",
+                f"Could not check for updates: {update_info['error']}")
+        elif update_info:
             msg = QMessageBox(self)
             msg.setWindowTitle("Update Available")
             msg.setTextFormat(Qt.TextFormat.RichText)

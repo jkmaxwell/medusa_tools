@@ -6,12 +6,26 @@
 # Minor version for new functionality in a backwards compatible manner
 # Patch version for backwards compatible bug fixes
 
-__version__ = "1.5.2"
+__version__ = "1.5.3"
 __author__ = "jkmaxwell"
 __app_name__ = "Medusa Wavetable Utility"
 
 # Update history
 VERSION_HISTORY = {
+    "1.5.3": {
+        "date": "2026-07-02",
+        "changes": [
+            "Fixed FFmpeg lookup in the packaged app — Create from Audio Files works again",
+            "Alphabetical/random ordering now applies with 64 or fewer input files",
+            "Create fills all 64 slots by cycling sources when given fewer than 64 files",
+            "Decompile now validates .polyend files instead of extracting garbage",
+            "process command converts sample rate and bit depth correctly (8/16/24/32-bit, any rate)",
+            "Clear error when recompiling from an incomplete set of WAV files",
+            "Web app: fixed temp-file cleanup, sanitized output filenames, debug mode off by default",
+            "GUI: background errors no longer leave buttons stuck disabled; update check can't race operations",
+            "Repaired and expanded the test suite",
+        ]
+    },
     "1.5.2": {
         "date": "2026-06-04",
         "changes": [

@@ -32,7 +32,6 @@ common_analysis = {
     'pathex': [],
     'binaries': [],
     'datas': [
-        ('medusa_core.py', '.'),
         ('version.py', '.'),
         ('styles', 'styles'),
         ('tools/version_manager.py', 'tools'),

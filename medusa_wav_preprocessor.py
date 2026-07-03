@@ -25,7 +25,10 @@ def resample_to_44100(data, original_sr):
 
 def normalize_audio(data):
     """Normalize audio to -1.0 to 1.0 range."""
-    return data / np.max(np.abs(data))
+    peak = np.max(np.abs(data))
+    if peak == 0:
+        return data  # silent input — nothing to normalize
+    return data / peak
 
 def find_zero_crossings(data):
     """Find zero crossing points in the audio."""
