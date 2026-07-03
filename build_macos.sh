@@ -26,9 +26,19 @@ if [ -d "dist" ]; then
     rm -rf dist
 fi
 
+# Use the project venv's PyInstaller if it isn't on PATH
+if command -v pyinstaller >/dev/null 2>&1; then
+    PYINSTALLER=pyinstaller
+elif [ -x "venv/bin/pyinstaller" ]; then
+    PYINSTALLER="venv/bin/pyinstaller"
+else
+    echo -e "${RED}PyInstaller not found. Install it with: venv/bin/pip install pyinstaller${NC}"
+    exit 1
+fi
+
 # Build the app with --clean flag to ensure clean build
-echo "Building with PyInstaller..."
-pyinstaller --clean medusa.spec
+echo "Building with PyInstaller ($PYINSTALLER)..."
+"$PYINSTALLER" --clean medusa.spec
 
 # Check if build was successful
 if [ ! -d "$APP_PATH" ]; then
