@@ -23,6 +23,7 @@ VERSION_HISTORY = {
             "Clear error when recompiling from an incomplete set of WAV files",
             "Web app: fixed temp-file cleanup, sanitized output filenames, debug mode off by default",
             "GUI: background errors no longer leave buttons stuck disabled; update check can't race operations",
+            "GUI: Create save dialog no longer defaults to the read-only system root when launched from Finder",
             "Repaired and expanded the test suite",
         ]
     },

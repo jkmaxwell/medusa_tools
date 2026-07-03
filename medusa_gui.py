@@ -363,10 +363,12 @@ class MedusaApp(QMainWindow):
 
         random_mode = self.selection_group.checkedButton().text() == "Random"
 
+        # Default the save dialog to the chosen input directory — a relative
+        # default resolves against cwd, which is "/" when launched from Finder
         output_file, _ = QFileDialog.getSaveFileName(
             self,
             "Save Wavetable Bank As",
-            "wavetables.polyend",
+            os.path.join(input_dir, "wavetables.polyend"),
             "Polyend Files (*.polyend)"
         )
         if not output_file:
