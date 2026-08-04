@@ -21,18 +21,9 @@ medusa_tools/
 └── ...                 # Other project files
 ```
 
-=======
+## About This Code
 
-1. **The GUI version is temporarily unavailable. Please use the CLI version described below for all operations.**
-2. I haven't been a professional engineer since 2005 when I worked on Apple's AJAX libraries. 90% of this code here was written with the help of AI (ChatGPT, Claude Code, RooCode). I honestly could not write this myself nor fix things without AI. So, please use and evaluate it with that knowledge. AI was my engineering partner, and I was effectively PM on it.
-
->>>>>>> a37015f339995e54426432ec2504da58cd71a236
->>>>>>>
->>>>>>
->>>>>
->>>>
->>>
->>
+I haven't been a professional engineer since 2005, when I worked on Apple's AJAX libraries. About 90% of the code here was written with the help of AI (ChatGPT, Claude Code, RooCode). I honestly could not write this myself, nor fix things without AI. AI was my engineering partner and I was effectively PM on it. Please use and evaluate it with that knowledge.
 
 ## Installation
 
