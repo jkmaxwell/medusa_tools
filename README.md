@@ -2,13 +2,9 @@
 
 A collection of tools for working with Polyend Medusa synthesizer files. MacOS only.
 
-## 🌐 NEW: Web Version Available!
+## Contributing & Complaints
 
-**No downloads, no quarantine issues, no installation required!**
-
-Try the web version at: `http://localhost:5001` (run `./run_web.sh`)
-
-Perfect for users who want to avoid macOS quarantine restrictions.
+This is a free, unpaid, spare-time project. If something doesn't work the way you want it to, you are very welcome to open a pull request. Complaints without a PR attached will be read with interest and no particular urgency.
 
 ## Project Structure
 
@@ -39,24 +35,6 @@ medusa_tools/
 >>
 
 ## Installation
-
-### 🌐 Web Version (Recommended)
-
-**Zero installation, works everywhere:**
-
-```bash
-# Clone or download this repo
-git clone https://github.com/jkmaxwell/medusa_tools.git
-cd medusa_tools
-
-# Install web dependencies
-pip install -r requirements_web.txt
-
-# Start the web server
-./run_web.sh
-```
-
-Open your browser to `http://localhost:5001` and enjoy!
 
 ### GUI Version (macOS App)
 

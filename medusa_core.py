@@ -260,7 +260,7 @@ def get_ffmpeg_path():
             pass  # signed/translocated bundles may be read-only
         return ffmpeg_path
     else:
-        # First try to find FFmpeg using 'which' command (works on Linux/Railway)
+        # First try to find FFmpeg using 'which' command
         try:
             result = subprocess.run(['which', 'ffmpeg'], capture_output=True, text=True, check=True)
             ffmpeg_path = result.stdout.strip()
