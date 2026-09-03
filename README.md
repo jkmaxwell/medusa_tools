@@ -1,4 +1,4 @@
-![Medusa Screenshot](https://private-user-images.githubusercontent.com/342903/428275324-ed869db9-9f44-4264-8f77-b9336d37d26e.png)
+![medusa](https://github.com/jkmaxwell/medusa_tools/blob/main/images/428275324-ed869db9-9f44-4264-8f77-b9336d37d26e.png)
 
 # Polyend Medusa Tools
 
